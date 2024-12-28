@@ -38,21 +38,21 @@ func (s *PGStore) dbInit() error {
 	if err := s.createUserTable(); err != nil {
 		return err
 	}
-	// if err := s.createTagTable(); err != nil {
-	// 	return err
-	// }
-	// if err := s.createThreadTable(); err != nil {
-	// 	return err
-	// }
-	// if err := s.createCommentTable(); err != nil {
-	// 	return err
-	// }
-	// if err := s.createVoteTable(); err != nil {
-	// 	return err
-	// }
-	// if err := s.createVoteTable(); err != nil {
-	// 	return err
-	// }
+	if err := s.createTagTable(); err != nil {
+		return err
+	}
+	if err := s.createThreadTable(); err != nil {
+		return err
+	}
+	if err := s.createCommentTable(); err != nil {
+		return err
+	}
+	if err := s.createVoteTable(); err != nil {
+		return err
+	}
+	if err := s.createImageTable(); err != nil {
+		return err
+	}
 
 	//SEED DATA
 	s.seedUserTable()
@@ -119,7 +119,7 @@ func (s *PGStore) createThreadTable() error {
 		content TEXT NOT NULL,
 		authorID UUID NOT NULL REFERENCES users(userID) ON DELETE SET NULL,
 		tagID UUID NOT NULL REFERENCES tags(tagID) ON DELETE RESTRICT,
-		createdAt TIMESTAMP NOT NULL
+		createdAt TIMESTAMP NOT NULL,
 		updatedAt TIMESTAMP NOT NULL
 	);`
 
@@ -133,9 +133,9 @@ func (s *PGStore) createCommentTable() error {
 		commentID UUID PRIMARY KEY,
 		content TEXT NOT NULL,
 		voteCount INTEGER NOT NULL,
-		authorID UUID NOT NULL REFERENCES user(userID) ON DELETE SET NULL,
-		threadID UUID NOT NULL REFERENCES thread(threadID) ON DELETE CASCADE,
-		createdAt TIMESTAMP NOT NULL
+		authorID UUID NOT NULL REFERENCES users(userID) ON DELETE SET NULL,
+		threadID UUID NOT NULL REFERENCES threads(threadID) ON DELETE CASCADE,
+		createdAt TIMESTAMP NOT NULL,
 		updatedAt TIMESTAMP NOT NULL
 	);`
 
@@ -149,7 +149,7 @@ func (s *PGStore) createVoteTable() error {
 		voteID UUID PRIMARY KEY,
 		voteValue INTEGER NOT NULL,
 		authorID UUID NOT NULL REFERENCES users(userID) ON DELETE SET NULL,
-		commentID UUID NOT NULL REFERENCES threads(threadID) ON DELETE CASCADE,
+		commentID UUID NOT NULL REFERENCES threads(threadID) ON DELETE CASCADE
 	);`
 
 	_, err := s.DB.Exec(query)
@@ -160,7 +160,7 @@ func (s *PGStore) createImageTable() error {
 	logInfo("Running createImageTable")
 	query := `CREATE TABLE IF NOT EXISTS images (
 		imageID UUID PRIMARY KEY,
-		threadID UUID NOT NULL REFERENCES users(userID) ON DELETE CASCADE,
+		threadID UUID NOT NULL REFERENCES users(userID) ON DELETE CASCADE
 	);`
 
 	_, err := s.DB.Exec(query)
