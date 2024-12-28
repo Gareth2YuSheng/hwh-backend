@@ -7,7 +7,8 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func validateJWT(tokenString, jwtSecret string) (*jwt.Token, error) {
+func ValidateJWT(tokenString, jwtSecret string) (*jwt.Token, error) {
+	logInfo("Running ValidateJWT")
 	return jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -19,7 +20,8 @@ func validateJWT(tokenString, jwtSecret string) (*jwt.Token, error) {
 	})
 }
 
-func createJWT(user *User, jwtSecret string) (string, error) {
+func CreateJWT(user *User, jwtSecret string) (string, error) {
+	logInfo("Running CreateJWT")
 	accessTokenExpireTime := time.Now().Add(time.Hour * 48).Unix()
 
 	claims := &jwt.MapClaims{

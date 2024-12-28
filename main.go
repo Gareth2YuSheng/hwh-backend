@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"net/http"
 	"os"
 
@@ -16,35 +16,38 @@ type APIConfig struct {
 }
 
 func main() {
+	logInfo("Loading env variables")
 	//Load .env file
 	godotenv.Load(".env")
 	port := os.Getenv("PORT")
 	if port == "" {
-		log.Fatal("PORT NOT FOUND")
+		logFatal("PORT NOT FOUND", nil)
 	}
 	databaseURL := os.Getenv("DB_URL")
 	if databaseURL == "" {
-		log.Fatal("DB_URL NOT FOUND")
+		logFatal("DB_URL NOT FOUND", nil)
 	}
 	jwtSecret := os.Getenv("JWT_SECRET")
 	if jwtSecret == "" {
-		log.Fatal("JWT_SECRET NOT FOUND")
+		logFatal("JWT_SECRET NOT FOUND", nil)
 	}
 
+	logInfo("Connecting to DB")
 	//Connect to DB
-	// store, err := NewPGStore(databaseURL)
-	// if err != nil {
-	// 	log.Fatalf("UNABLE TO CONNECT TO DATABASE: %v", err)
-	// }
+	store, err := NewPGStore(databaseURL)
+	if err != nil {
+		logFatal("UNABLE TO CONNECT TO DATABASE", err)
+	}
 	apiCfg := APIConfig{
-		// DB:        store,
+		DB:        store,
 		JwtSecret: jwtSecret,
 	}
-	// //Init DB
-	// if err := store.Init(); err != nil {
-	// 	log.Fatal(err)
-	// }
+	//Init DB
+	if err := store.dbInit(); err != nil {
+		logFatal("UNABLE TO INITIALIZE DATABASE", err)
+	}
 
+	logInfo("Creating Routers")
 	//ROUTERS
 	router := chi.NewRouter()
 
@@ -62,7 +65,8 @@ func main() {
 	commentRouter := chi.NewRouter()
 
 	//router.Get("/healthz", handlerTest)
-	accountRouter.Post("/register", apiCfg.handlerCreateAccount)
+	accountRouter.Post("/register", apiCfg.handlerCreateUser)
+	accountRouter.Post("/login", apiCfg.handlerLogin)
 
 	router.Mount("/account", accountRouter)
 	router.Mount("/thread", threadRouter)
@@ -72,9 +76,9 @@ func main() {
 		Handler: router,
 		Addr:    ":" + port,
 	}
-	log.Printf("Server starting on port %v", port)
-	err := server.ListenAndServe()
+	logInfo(fmt.Sprintf("Server starting on port: %v", port))
+	err = server.ListenAndServe()
 	if err != nil {
-		log.Fatal(err)
+		logFatal("FAILED TO START SERVER", err)
 	}
 }

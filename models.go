@@ -10,7 +10,7 @@ type User struct {
 	UserID    uuid.UUID `json:"userId"`
 	Username  string    `json:"username"`
 	Password  string    `json:"-"` //does not show in the json
-	Role      string    `json:"-"` //does not show in the json
+	Role      string    `json:"role"`
 	CreatedAt time.Time `json:"createdAt"`
 }
 
@@ -49,4 +49,43 @@ type Tag struct {
 type Image struct {
 	ImageID  uuid.UUID `json:"imageId"`
 	ThreadID uuid.UUID `json:"threaId"`
+}
+
+func NewStandardUser(username, password string) (*User, error) {
+	logInfo("Running NewStandardUser")
+	encryptedPwd, err := GeneratePassword(password)
+	if err != nil {
+		return nil, err
+	}
+	if password != "" {
+		return &User{
+			UserID:    uuid.New(),
+			Username:  username,
+			Password:  string(encryptedPwd),
+			Role:      "Standard",
+			CreatedAt: time.Now().Local().UTC(),
+		}, nil
+	}
+	return &User{
+		UserID:    uuid.New(),
+		Username:  username,
+		Role:      "Standard",
+		CreatedAt: time.Now().Local().UTC(),
+	}, nil
+
+}
+
+func NewAdminUser(username, password string) (*User, error) {
+	logInfo("Running NewAdminUser")
+	encryptedPwd, err := GeneratePassword(password)
+	if err != nil {
+		return nil, err
+	}
+	return &User{
+		UserID:    uuid.New(),
+		Username:  username,
+		Password:  string(encryptedPwd),
+		Role:      "Admin",
+		CreatedAt: time.Now().Local().UTC(),
+	}, nil
 }

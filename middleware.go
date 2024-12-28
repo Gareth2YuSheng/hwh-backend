@@ -2,36 +2,29 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 )
 
 type authenticatedHandler func(http.ResponseWriter, *http.Request, User)
 
-func permissionDenied(w http.ResponseWriter) {
-	respondERROR(w, http.StatusForbidden, "Permission Denied")
-}
-
 func (apiCfg *APIConfig) middlewareAuth(handler authenticatedHandler) http.HandlerFunc {
-	log.Println("Running middlewareAuth")
+	logInfo("Running middlewareAuth")
 	return func(w http.ResponseWriter, r *http.Request) {
 		auth := r.Header.Get("Authorization")
 		if auth == "" {
-			//WriteJSON(w, http.StatusForbidden, ApiError{Error: "authorization header not found"})
-			permissionDenied(w)
+			PermissionDeniedRes(w)
 			return
 		}
 		splitToken := strings.Split(auth, "Bearer ")
 		//Check if "Bearer" in auth header
 		if len(splitToken) < 2 {
-			//WriteJSON(w, http.StatusForbidden, ApiError{Error: "invalid authorization header"})
-			permissionDenied(w)
+			PermissionDeniedRes(w)
 			return
 		}
 
 		tokenString := splitToken[1]
-		fmt.Printf("Token String: ", tokenString)
+		fmt.Printf("Token String: %s", tokenString)
 		// token, err := validateJWT(tokenString)
 		// if err != nil {
 		// 	//WriteJSON(w, http.StatusForbidden, ApiError{Error: "invalid token"})

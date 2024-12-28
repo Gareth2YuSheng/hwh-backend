@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"log"
+	"fmt"
 	"net/http"
 )
 
@@ -19,7 +19,7 @@ func respondJSON(w http.ResponseWriter, statusCode int, success bool, message st
 		Message: message,
 	})
 	if err != nil {
-		log.Fatalf("Failed to marshal JSON response: %v", res)
+		logError(fmt.Sprintf("Failed to marshal JSON response: %v", res), err)
 		w.WriteHeader(500)
 		//return fmt.Errorf("Failed to marshal JSON response: %v", res)
 		return
