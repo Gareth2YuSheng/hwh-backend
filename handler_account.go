@@ -21,6 +21,8 @@ func (apiCfg *APIConfig) handlerCreateUser(w http.ResponseWriter, r *http.Reques
 	user, err := NewStandardUser(req.Username, req.Password)
 	if err != nil {
 		logError("Error Creating New Standard User Template", err)
+		respondERROR(w, http.StatusBadRequest, "Failed to Register User")
+		return
 	}
 	fmt.Printf("New User: %v\n", user) //remove later
 
@@ -32,7 +34,7 @@ func (apiCfg *APIConfig) handlerCreateUser(w http.ResponseWriter, r *http.Reques
 			return
 		}
 		logError("Unable to Create User", err)
-		respondERROR(w, http.StatusBadRequest, "Failed to Register User")
+		respondERROR(w, http.StatusInternalServerError, "Failed to Register User")
 		return
 	}
 

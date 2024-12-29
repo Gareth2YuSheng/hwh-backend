@@ -19,3 +19,18 @@ type LoginResponse struct {
 	Role        string    `json:"role"`
 	AccessToken string    `json:"accessToken"`
 }
+
+type CreateThreadRequest struct {
+	Title    string `json:"title"`
+	Content  string `json:"content"`
+	AuthorID string `json:"authorId"`
+	TagID    string `json:"tagId"`
+}
+
+type CreateTagRequest struct {
+	Name string `json:"name"`
+}
+
+type GetTagsResponse struct {
+	Tags []*Tag `json:"tags"`
+}

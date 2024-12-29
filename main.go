@@ -63,14 +63,23 @@ func main() {
 	accountRouter := chi.NewRouter()
 	threadRouter := chi.NewRouter()
 	commentRouter := chi.NewRouter()
+	tagRouter := chi.NewRouter()
 
-	//router.Get("/healthz", handlerTest)
+	//Account Routes
 	accountRouter.Post("/register", apiCfg.handlerCreateUser)
 	accountRouter.Post("/login", apiCfg.handlerLogin)
+
+	//Thread Routes
+	threadRouter.Post("/create", apiCfg.handlerCreateThread) //add auth
+
+	//Tag Routes
+	tagRouter.Post("/create", apiCfg.middlewareAuth(apiCfg.handlerCreateTag)) //add auth
+	tagRouter.Get("/all", apiCfg.middlewareAuth(apiCfg.handlerGetAllTags))    //add auth
 
 	router.Mount("/account", accountRouter)
 	router.Mount("/thread", threadRouter)
 	router.Mount("/comment", commentRouter)
+	router.Mount("/tag", tagRouter)
 
 	server := &http.Server{
 		Handler: router,

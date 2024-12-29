@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
 
 func ValidateJWT(tokenString, jwtSecret string) (*jwt.Token, error) {
@@ -31,4 +32,10 @@ func CreateJWT(user *User, jwtSecret string) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(jwtSecret))
+}
+
+func GetUserIDFromJWT(token *jwt.Token) (uuid.UUID, error) {
+	logInfo("Running GetUserIDFromJWT")
+	claims := token.Claims.(jwt.MapClaims)
+	return uuid.Parse(claims["userId"].(string))
 }

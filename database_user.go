@@ -21,7 +21,6 @@ func (s *PGStore) CreateUser(user *User) error {
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
 
@@ -35,7 +34,6 @@ func (s *PGStore) GetUserByUserID(userID uuid.UUID) (*User, error) {
 	for rows.Next() {
 		return scanIntoUser(rows)
 	}
-
 	return nil, fmt.Errorf("user [%v] not found", userID)
 }
 
@@ -49,7 +47,6 @@ func (s *PGStore) GetUserByUsername(username string) (*User, error) {
 	for rows.Next() {
 		return scanIntoUser(rows)
 	}
-
 	return nil, fmt.Errorf("user [%s] not found", username)
 }
 

@@ -9,59 +9,51 @@ import (
 type authenticatedHandler func(http.ResponseWriter, *http.Request, User)
 
 func (apiCfg *APIConfig) middlewareAuth(handler authenticatedHandler) http.HandlerFunc {
-	logInfo("Running middlewareAuth")
 	return func(w http.ResponseWriter, r *http.Request) {
+		logInfo("Running middlewareAuth")
 		auth := r.Header.Get("Authorization")
 		if auth == "" {
+			logError("Missing Auth Header", nil)
 			PermissionDeniedRes(w)
 			return
 		}
 		splitToken := strings.Split(auth, "Bearer ")
 		//Check if "Bearer" in auth header
 		if len(splitToken) < 2 {
+			logError("Incorrect Auth Header", nil)
 			PermissionDeniedRes(w)
 			return
 		}
 
 		tokenString := splitToken[1]
-		fmt.Printf("Token String: %s", tokenString)
-		// token, err := validateJWT(tokenString)
-		// if err != nil {
-		// 	//WriteJSON(w, http.StatusForbidden, ApiError{Error: "invalid token"})
-		// 	permissionDenied(w)
-		// 	return
-		// }
-		// if !token.Valid {
-		// 	//WriteJSON(w, http.StatusForbidden, ApiError{Error: "invalid token"})
-		// 	permissionDenied(w)
-		// 	return
-		// }
+		// fmt.Printf("Token String: %s\n", tokenString) //remove later
+		token, err := ValidateJWT(tokenString, apiCfg.JwtSecret)
+		if err != nil {
+			logError("Error Validating JWT", err)
+			PermissionDeniedRes(w)
+			return
+		}
+		if !token.Valid {
+			logError("Invalid JWT", nil)
+			PermissionDeniedRes(w)
+			return
+		}
 
-		//Change this Part
-		// userID, err := getID(r)
-		// if err != nil {
-		// 	//WriteJSON(w, http.StatusForbidden, ApiError{Error: "invalid token"})
-		// 	permissionDenied(w)
-		// 	return
-		// }
-		// account, err := s.GetAccountByID(userID)
-		// if err != nil {
-		// 	//WriteJSON(w, http.StatusForbidden, ApiError{Error: "invalid token"})
-		// 	permissionDenied(w)
-		// 	return
-		// }
-		// claims := token.Claims.(jwt.MapClaims)
-		// if account.Number != int64(claims["accountNumber"].(float64)) {
-		// 	permissionDenied(w)
-		// 	return
-		// }
+		userId, err := GetUserIDFromJWT(token)
+		if err != nil {
+			logError("Error Retrieving UserID from JWT", err)
+			PermissionDeniedRes(w)
+			return
+		}
+		fmt.Println("User: ", userId)
 
-		//easiest way is to sign the userID into the JWT and check if the provided data matches
-		//with the userID in the JWT
-		//Change all error messages to Permission denied
+		user, err := apiCfg.DB.GetUserByUserID(userId)
+		if err != nil {
+			logError(fmt.Sprintf("Unable to Get User [%v] using UserID in JWT", userId), err)
+			PermissionDeniedRes(w)
+			return
+		}
 
-		// user :=
-
-		// handler(w, r, user)
+		handler(w, r, *user)
 	}
 }

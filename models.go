@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -77,6 +78,9 @@ func NewStandardUser(username, password string) (*User, error) {
 
 func NewAdminUser(username, password string) (*User, error) {
 	logInfo("Running NewAdminUser")
+	if password == "" {
+		return nil, fmt.Errorf("password cannot be empty for admin user")
+	}
 	encryptedPwd, err := GeneratePassword(password)
 	if err != nil {
 		return nil, err
@@ -87,5 +91,13 @@ func NewAdminUser(username, password string) (*User, error) {
 		Password:  string(encryptedPwd),
 		Role:      "Admin",
 		CreatedAt: time.Now().Local().UTC(),
+	}, nil
+}
+
+func NewTag(name string) (*Tag, error) {
+	logInfo("Running NewTag")
+	return &Tag{
+		TagID: uuid.New(),
+		Name:  name,
 	}, nil
 }
