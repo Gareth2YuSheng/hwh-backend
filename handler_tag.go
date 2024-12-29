@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-// CREATE NEW THREAD
+// CREATE NEW TAG
 func (apiCfg *APIConfig) handlerCreateTag(w http.ResponseWriter, r *http.Request, user User) {
 	logInfo("Running handlerCreateTag")
 	req := CreateTagRequest{}
@@ -20,7 +20,7 @@ func (apiCfg *APIConfig) handlerCreateTag(w http.ResponseWriter, r *http.Request
 	tag, err := NewTag(req.Name)
 	if err != nil {
 		logError("Error Creating New Standard Tag Template", err)
-		respondERROR(w, http.StatusBadRequest, "Failed to Create Tag")
+		respondERROR(w, http.StatusBadRequest, "Failed to Create Tag, Invalid Tag Details")
 		return
 	}
 	fmt.Printf("New Tag: %v\n", tag) //remove later
@@ -40,6 +40,7 @@ func (apiCfg *APIConfig) handlerCreateTag(w http.ResponseWriter, r *http.Request
 	respondOK(w, http.StatusCreated, "Tag Created Successfully", nil)
 }
 
+// GET ALL TAGS
 func (apiCfg *APIConfig) handlerGetAllTags(w http.ResponseWriter, r *http.Request, user User) {
 	logInfo("Running handlerGetAllTags")
 	tags, err := apiCfg.DB.GetAllTags()

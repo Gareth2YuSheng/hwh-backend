@@ -231,7 +231,8 @@ func (s *PGStore) createCommentTable() error {
 		authorID UUID NOT NULL REFERENCES users(userID) ON DELETE SET NULL,
 		threadID UUID NOT NULL REFERENCES threads(threadID) ON DELETE CASCADE,
 		createdAt TIMESTAMP NOT NULL,
-		updatedAt TIMESTAMP NOT NULL
+		updatedAt TIMESTAMP NOT NULL,
+		isAnswer BOOLEAN NOT NULL
 	);`
 
 	_, err := s.DB.Exec(query)

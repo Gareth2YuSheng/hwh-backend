@@ -25,6 +25,14 @@ type Thread struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
+type ThreadCondensed struct {
+	ThreadID  uuid.UUID `json:"threadId"`
+	Title     string    `json:"title"`
+	AuthorID  uuid.UUID `json:"authorId"`
+	TagID     uuid.UUID `json:"tagId"`
+	CreatedAt time.Time `json:"createdAt"`
+}
+
 type Comment struct {
 	CommentID uuid.UUID `json:"commentId"`
 	Content   string    `json:"content"`
@@ -33,6 +41,7 @@ type Comment struct {
 	ThreadID  uuid.UUID `json:"threadId"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
+	IsAnswer  bool      `json:"isAnswer"`
 }
 
 type Vote struct {
@@ -54,6 +63,9 @@ type Image struct {
 
 func NewStandardUser(username, password string) (*User, error) {
 	logInfo("Running NewStandardUser")
+	if username == "" {
+		return nil, fmt.Errorf("username cannot be empty")
+	}
 	encryptedPwd, err := GeneratePassword(password)
 	if err != nil {
 		return nil, err
@@ -78,6 +90,9 @@ func NewStandardUser(username, password string) (*User, error) {
 
 func NewAdminUser(username, password string) (*User, error) {
 	logInfo("Running NewAdminUser")
+	if username == "" {
+		return nil, fmt.Errorf("username cannot be empty")
+	}
 	if password == "" {
 		return nil, fmt.Errorf("password cannot be empty for admin user")
 	}
@@ -96,8 +111,42 @@ func NewAdminUser(username, password string) (*User, error) {
 
 func NewTag(name string) (*Tag, error) {
 	logInfo("Running NewTag")
+	if name == "" {
+		return nil, fmt.Errorf("tag name cannot be empty")
+	}
 	return &Tag{
 		TagID: uuid.New(),
 		Name:  name,
 	}, nil
+}
+
+func NewThread(title, content string, authorId, tagId uuid.UUID) (*Thread, error) {
+	logInfo("Running NewThread")
+	if title == "" {
+		return nil, fmt.Errorf("thread title cannot be empty")
+	}
+	if content == "" {
+		return nil, fmt.Errorf("thread content cannot be empty")
+	}
+	if authorId == uuid.Nil {
+		return nil, fmt.Errorf("thread authorID cannot be nil")
+	}
+	if tagId == uuid.Nil {
+		return nil, fmt.Errorf("thread tagID cannot be nil")
+	}
+	return &Thread{
+		ThreadID:  uuid.New(),
+		Title:     title,
+		Content:   content,
+		AuthorID:  authorId,
+		TagID:     tagId,
+		CreatedAt: time.Now().Local().UTC(),
+		UpdatedAt: time.Now().Local().UTC(),
+	}, nil
+}
+
+func (t *Thread) UpdateThread(title, content string) {
+	t.Title = title
+	t.Content = content
+	t.UpdatedAt = time.Now().Local().UTC()
 }

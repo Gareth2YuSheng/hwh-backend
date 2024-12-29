@@ -70,11 +70,14 @@ func main() {
 	accountRouter.Post("/login", apiCfg.handlerLogin)
 
 	//Thread Routes
-	threadRouter.Post("/create", apiCfg.handlerCreateThread) //add auth
+	threadRouter.Get("/all", apiCfg.middlewareAuth(apiCfg.handlerGetAllThreads))
+	threadRouter.Post("/create", apiCfg.middlewareAuth(apiCfg.handlerCreateThread))
+	threadRouter.Put("/{threadID}/update", apiCfg.middlewareAuth(apiCfg.handlerUpdateThread))
+	threadRouter.Delete("/{threadID}/delete", apiCfg.middlewareAuth(apiCfg.handlerDeleteThread))
 
 	//Tag Routes
-	tagRouter.Post("/create", apiCfg.middlewareAuth(apiCfg.handlerCreateTag)) //add auth
-	tagRouter.Get("/all", apiCfg.middlewareAuth(apiCfg.handlerGetAllTags))    //add auth
+	tagRouter.Get("/all", apiCfg.middlewareAuth(apiCfg.handlerGetAllTags))
+	tagRouter.Post("/create", apiCfg.middlewareAuth(apiCfg.handlerCreateTag))
 
 	router.Mount("/account", accountRouter)
 	router.Mount("/thread", threadRouter)

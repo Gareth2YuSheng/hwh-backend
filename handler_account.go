@@ -10,7 +10,6 @@ import (
 // REGISTER NEW USER
 func (apiCfg *APIConfig) handlerCreateUser(w http.ResponseWriter, r *http.Request) {
 	logInfo("Running handlerCreateUser")
-	//decoder := json.NewDecoder(r.Body)
 	req := CreateAccountRequest{}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		ErrorParsingJSON(err, w)
@@ -21,7 +20,7 @@ func (apiCfg *APIConfig) handlerCreateUser(w http.ResponseWriter, r *http.Reques
 	user, err := NewStandardUser(req.Username, req.Password)
 	if err != nil {
 		logError("Error Creating New Standard User Template", err)
-		respondERROR(w, http.StatusBadRequest, "Failed to Register User")
+		respondERROR(w, http.StatusBadRequest, "Failed to Register User, Invalid User Details")
 		return
 	}
 	fmt.Printf("New User: %v\n", user) //remove later

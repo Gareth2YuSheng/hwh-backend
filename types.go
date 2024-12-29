@@ -21,10 +21,14 @@ type LoginResponse struct {
 }
 
 type CreateThreadRequest struct {
-	Title    string `json:"title"`
-	Content  string `json:"content"`
-	AuthorID string `json:"authorId"`
-	TagID    string `json:"tagId"`
+	Title   string    `json:"title"`
+	Content string    `json:"content"`
+	TagID   uuid.UUID `json:"tagId"`
+}
+
+type UpdateThreadRequest struct {
+	Title   string `json:"title"`
+	Content string `json:"content"`
 }
 
 type CreateTagRequest struct {
@@ -33,4 +37,8 @@ type CreateTagRequest struct {
 
 type GetTagsResponse struct {
 	Tags []*Tag `json:"tags"`
+}
+
+type GetThreadsResponse struct {
+	Threads []*Thread `json:"threads"`
 }

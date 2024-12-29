@@ -20,7 +20,7 @@ func (s *PGStore) CreateTag(tag *Tag) error {
 
 func (s *PGStore) GetAllTags() ([]*Tag, error) {
 	logInfo("Running GetAllTags")
-	query := `SELECT * FROM tags`
+	query := `SELECT * FROM tags ORDER BY name ASC`
 	rows, err := s.DB.Query(query)
 	if err != nil {
 		return nil, err

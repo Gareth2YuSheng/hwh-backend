@@ -45,7 +45,7 @@ func (apiCfg *APIConfig) middlewareAuth(handler authenticatedHandler) http.Handl
 			PermissionDeniedRes(w)
 			return
 		}
-		fmt.Println("User: ", userId)
+		fmt.Printf("User: [%v]\n", userId) //remove later
 
 		user, err := apiCfg.DB.GetUserByUserID(userId)
 		if err != nil {

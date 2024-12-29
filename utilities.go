@@ -25,13 +25,18 @@ func PermissionDeniedRes(w http.ResponseWriter) {
 	respondERROR(w, http.StatusForbidden, "Permission Denied")
 }
 
-func SomethingWentWrongRes(w http.ResponseWriter) {
-	respondERROR(w, http.StatusBadRequest, "Something went wrong")
-}
+// func SomethingWentWrongRes(w http.ResponseWriter) {
+// 	respondERROR(w, http.StatusBadRequest, "Invalid Request Body")
+// }
 
 func ErrorParsingJSON(err error, w http.ResponseWriter) {
 	logError("Error parsing JSON", err)
-	SomethingWentWrongRes(w)
+	respondERROR(w, http.StatusBadRequest, "Invalid Request Body")
+}
+
+func InvalidURLQuery(message string, err error, w http.ResponseWriter) {
+	logError(message, err)
+	respondERROR(w, http.StatusBadRequest, "Invalid URL Query")
 }
 
 // BCRYPT FUNCTIONS
