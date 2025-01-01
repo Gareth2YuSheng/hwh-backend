@@ -29,10 +29,14 @@ func NewPGStore(dbURL string) (*PGStore, error) {
 func (s *PGStore) dbInit() error {
 	logInfo("Running dbInit")
 	//DROP TABLES
-	// s.dropAllTables()
+	// if err := s.dropAllTables(); err != nil {
+	// 	return err
+	// }
 
 	//CREATE TABLES
-	s.createAllTables()
+	if err := s.createAllTables(); err != nil {
+		return err
+	}
 
 	//SEED DATA
 	s.seedData()
@@ -44,10 +48,12 @@ func (s *PGStore) dbInit() error {
 
 func (s *PGStore) seedData() {
 	s.seedUserTable()
+	// s.seedThreadTallyTable()
 	s.seedTagTable()
 }
 
 func (s *PGStore) seedUserTable() {
+	logInfo("Running seedUserTable")
 	admin, err := NewAdminUser("Robin Banks", "root")
 	if err != nil {
 		logError("Error Creating New Admin User Template", err)
@@ -56,9 +62,19 @@ func (s *PGStore) seedUserTable() {
 	if err != nil && !strings.Contains(err.Error(), "duplicate key") {
 		logError("unable to Create Admin User", err)
 	}
+
+	user, err := NewStandardUser("John Doe", "ligma")
+	if err != nil {
+		logError("Error Creating New Standard User Template", err)
+	}
+	err = s.CreateUser(user)
+	if err != nil && !strings.Contains(err.Error(), "duplicate key") {
+		logError("unable to Create Standard User", err)
+	}
 }
 
 func (s *PGStore) seedTagTable() {
+	logInfo("Running seedTagTable")
 	tagEng, err := NewTag("English")
 	if err != nil {
 		logError("Error Creating New Tag Template - English", err)
@@ -71,6 +87,7 @@ func (s *PGStore) seedTagTable() {
 	if err != nil {
 		logError("Error Creating New Tag Template - Science", err)
 	}
+
 	err = s.CreateTag(tagEng)
 	if err != nil && !strings.Contains(err.Error(), "duplicate key") {
 		logError("unable to Create Default English Tag", err)
@@ -85,6 +102,14 @@ func (s *PGStore) seedTagTable() {
 	}
 }
 
+// func (s *PGStore) seedThreadTallyTable() {
+// 	logInfo("Running seedThreadTallyTable")
+// 	err := s.CreateTotalThreadTally()
+// 	if err != nil && !strings.Contains(err.Error(), "duplicate key") {
+// 		logError("unable to Create Total Thread Tally", err)
+// 	}
+// }
+
 //DROP TABLE FUNCTIONS
 
 func (s *PGStore) dropAllTables() error {
@@ -97,6 +122,9 @@ func (s *PGStore) dropAllTables() error {
 	if err := s.dropCommentTable(); err != nil {
 		return err
 	}
+	// if err := s.dropThreadTallyTable(); err != nil {
+	// 	return err
+	// }
 	if err := s.dropThreadTable(); err != nil {
 		return err
 	}
@@ -132,6 +160,14 @@ func (s *PGStore) dropThreadTable() error {
 	_, err := s.DB.Exec(query)
 	return err
 }
+
+// func (s *PGStore) dropThreadTallyTable() error {
+// 	logInfo("Running dropThreadTallyTable")
+// 	query := `DROP TABLE IF EXISTS threadtally;`
+
+// 	_, err := s.DB.Exec(query)
+// 	return err
+// }
 
 func (s *PGStore) dropCommentTable() error {
 	logInfo("Running dropCommentTable")
@@ -169,6 +205,9 @@ func (s *PGStore) createAllTables() error {
 	if err := s.createThreadTable(); err != nil {
 		return err
 	}
+	// if err := s.createThreadTallyTable(); err != nil {
+	// 	return err
+	// }
 	if err := s.createCommentTable(); err != nil {
 		return err
 	}
@@ -212,6 +251,7 @@ func (s *PGStore) createThreadTable() error {
 		threadID UUID PRIMARY KEY,
 		title VARCHAR(200) NOT NULL,
 		content TEXT NOT NULL,
+		commentCount INTEGER NOT NULL,
 		authorID UUID NOT NULL REFERENCES users(userID) ON DELETE SET NULL,
 		tagID UUID NOT NULL REFERENCES tags(tagID) ON DELETE RESTRICT,
 		createdAt TIMESTAMP NOT NULL,
@@ -221,6 +261,18 @@ func (s *PGStore) createThreadTable() error {
 	_, err := s.DB.Exec(query)
 	return err
 }
+
+// func (s *PGStore) createThreadTallyTable() error {
+// 	logInfo("Running createThreadTallyTable")
+// 	query := `CREATE TABLE IF NOT EXISTS threadtally (
+// 		tallyID SERIAL PRIMARY KEY,
+// 		tagID UUID NULL REFERENCES tags(tagID) ON DELETE RESTRICT,
+// 		count INTEGER NOT NULL
+// 	);`
+
+// 	_, err := s.DB.Exec(query)
+// 	return err
+// }
 
 func (s *PGStore) createCommentTable() error {
 	logInfo("Running createCommentTable")
@@ -245,7 +297,7 @@ func (s *PGStore) createVoteTable() error {
 		voteID UUID PRIMARY KEY,
 		voteValue INTEGER NOT NULL,
 		authorID UUID NOT NULL REFERENCES users(userID) ON DELETE SET NULL,
-		commentID UUID NOT NULL REFERENCES threads(threadID) ON DELETE CASCADE
+		commentID UUID NOT NULL REFERENCES comments(commentID) ON DELETE CASCADE
 	);`
 
 	_, err := s.DB.Exec(query)

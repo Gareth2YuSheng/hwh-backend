@@ -6,21 +6,28 @@ import (
 
 func (s *PGStore) CreateTag(tag *Tag) error {
 	logInfo("Running CreateTag")
+	//Create Tag
 	query := `INSERT INTO tags
 	(tagID, name)
-	values ($1, $2)`
+	values ($1, $2);`
 	_, err := s.DB.Query(query,
 		tag.TagID,
 		tag.Name)
 	if err != nil {
 		return err
 	}
+	//Create ThreadTally for the Tag
+	// err = s.CreateThreadTally(&ThreadTally{TagID: tag.TagID, Count: 0})
+	// if err != nil {
+	// 	logError(fmt.Sprintf("Unable to Create ThreadTally for new Tag [%d]", tag.TagID), err)
+	// 	return err
+	// }
 	return nil
 }
 
 func (s *PGStore) GetAllTags() ([]*Tag, error) {
 	logInfo("Running GetAllTags")
-	query := `SELECT * FROM tags ORDER BY name ASC`
+	query := `SELECT * FROM tags ORDER BY name ASC;`
 	rows, err := s.DB.Query(query)
 	if err != nil {
 		return nil, err

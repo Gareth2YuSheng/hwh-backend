@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -46,4 +47,9 @@ func GeneratePassword(password string) ([]byte, error) {
 
 func ComparePassword(hashedPwd, pwd string) bool {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPwd), []byte(pwd)) == nil
+}
+
+// TIME FUNCTIONS
+func getTimeNow() time.Time {
+	return time.Now().Local().UTC()
 }

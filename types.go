@@ -13,13 +13,6 @@ type LoginRequest struct {
 	Password string `json:"password"`
 }
 
-type LoginResponse struct {
-	UserID      uuid.UUID `json:"userId"`
-	Username    string    `json:"username"`
-	Role        string    `json:"role"`
-	AccessToken string    `json:"accessToken"`
-}
-
 type CreateThreadRequest struct {
 	Title   string    `json:"title"`
 	Content string    `json:"content"`
@@ -35,10 +28,63 @@ type CreateTagRequest struct {
 	Name string `json:"name"`
 }
 
+type CreateCommentRequest struct {
+	Content string `json:"content"`
+}
+
+type MarkCommentAsAnswerRequest struct {
+	IsAnswer bool `json:"isAnswer"`
+}
+
+type VoteCommentRequest struct {
+	VoteType string `json:"voteType"`
+}
+
+//RESPONSES
+type LoginResponse struct {
+	UserID      uuid.UUID `json:"userId"`
+	Username    string    `json:"username"`
+	Role        string    `json:"role"`
+	AccessToken string    `json:"accessToken"`
+}
+
 type GetTagsResponse struct {
 	Tags []*Tag `json:"tags"`
 }
 
 type GetThreadsResponse struct {
-	Threads []*Thread `json:"threads"`
+	ThreadCount int                `json:"threadCount"`
+	Threads     []*ThreadCondensed `json:"threads"`
+}
+
+type GetThreadDetailsResponse struct {
+	Thread *Thread `json:"thread"`
+	// Commends []*Comment `json:"comments"`
+}
+
+type GetCommentsResponse struct {
+	CommentCount int        `json:"commentCount"`
+	Comments     []*Comment `json:"comments"`
+}
+
+type GetCommentsWithVoteResponse struct {
+	CommentCount int                         `json:"commentCount"`
+	Comments     []*CommentWithVoteCondensed `json:"comments"`
+}
+
+//OTHERS
+type GetThread struct {
+	Thread *ThreadCondensed
+	Count  int
+}
+
+type GetComment struct {
+	Comment *Comment
+	Count   int
+}
+
+type GetCommentWithVoteSQL struct {
+	Comment *Comment
+	Vote    *VoteSQL
+	Count   int
 }

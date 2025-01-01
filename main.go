@@ -71,6 +71,7 @@ func main() {
 
 	//Thread Routes
 	threadRouter.Get("/all", apiCfg.middlewareAuth(apiCfg.handlerGetAllThreads))
+	threadRouter.Get("/{threadID}/details", apiCfg.middlewareAuth(apiCfg.handlerGetTheadDetails))
 	threadRouter.Post("/create", apiCfg.middlewareAuth(apiCfg.handlerCreateThread))
 	threadRouter.Put("/{threadID}/update", apiCfg.middlewareAuth(apiCfg.handlerUpdateThread))
 	threadRouter.Delete("/{threadID}/delete", apiCfg.middlewareAuth(apiCfg.handlerDeleteThread))
@@ -78,6 +79,15 @@ func main() {
 	//Tag Routes
 	tagRouter.Get("/all", apiCfg.middlewareAuth(apiCfg.handlerGetAllTags))
 	tagRouter.Post("/create", apiCfg.middlewareAuth(apiCfg.handlerCreateTag))
+
+	//Comment Routes
+	commentRouter.Get("/{threadID}", apiCfg.middlewareAuth(apiCfg.handlerGetAllComments))
+	commentRouter.Post("/{threadID}/create", apiCfg.middlewareAuth(apiCfg.handlerCreateComment))
+	commentRouter.Put("/{commentID}/update", apiCfg.middlewareAuth(apiCfg.handlerUpdateComment))
+	commentRouter.Put("/{commentID}/answer", apiCfg.middlewareAuth(apiCfg.handlerMarkCommentAsAnswer))
+	commentRouter.Put("/{commentID}/vote", apiCfg.middlewareAuth(apiCfg.handlerVoteComment))
+	commentRouter.Delete("/{commentID}/delete", apiCfg.middlewareAuth(apiCfg.handlerDeleteComment))
+	commentRouter.Delete("/{commentID}/unvote", apiCfg.middlewareAuth(apiCfg.handlerUnVoteComment))
 
 	router.Mount("/account", accountRouter)
 	router.Mount("/thread", threadRouter)

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"time"
 
@@ -16,22 +17,34 @@ type User struct {
 }
 
 type Thread struct {
-	ThreadID  uuid.UUID `json:"threadId"`
-	Title     string    `json:"title"`
-	Content   string    `json:"content"`
-	AuthorID  uuid.UUID `json:"authorId"`
-	TagID     uuid.UUID `json:"tagId"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	ThreadID     uuid.UUID `json:"threadId"`
+	Title        string    `json:"title"`
+	Content      string    `json:"content"`
+	CommentCount int       `json:"commentCount"`
+	AuthorID     uuid.UUID `json:"authorId"`
+	TagID        uuid.UUID `json:"tagId"`
+	CreatedAt    time.Time `json:"createdAt"`
+	UpdatedAt    time.Time `json:"updatedAt"`
 }
 
 type ThreadCondensed struct {
-	ThreadID  uuid.UUID `json:"threadId"`
-	Title     string    `json:"title"`
-	AuthorID  uuid.UUID `json:"authorId"`
-	TagID     uuid.UUID `json:"tagId"`
-	CreatedAt time.Time `json:"createdAt"`
+	ThreadID     uuid.UUID `json:"threadId"`
+	Title        string    `json:"title"`
+	CommentCount int       `json:"commentCount"`
+	AuthorID     uuid.UUID `json:"authorId"`
+	TagID        uuid.UUID `json:"tagId"`
+	CreatedAt    time.Time `json:"createdAt"`
 }
+
+// type ThreadTally struct {
+// 	TallyID int       `json:"tallyId"`
+// 	TagID   uuid.UUID `json:"tagId"`
+// 	Count   int       `json:"count"`
+// }
+
+// type TotalThreadTally struct {
+// 	Count int `json:"count"`
+// }
 
 type Comment struct {
 	CommentID uuid.UUID `json:"commentId"`
@@ -44,11 +57,35 @@ type Comment struct {
 	IsAnswer  bool      `json:"isAnswer"`
 }
 
+type CommentWithVoteCondensed struct {
+	CommentID uuid.UUID `json:"commentId"`
+	Content   string    `json:"content"`
+	VoteCount int       `json:"voteCount"`
+	AuthorID  uuid.UUID `json:"authorId"`
+	ThreadID  uuid.UUID `json:"threadId"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	IsAnswer  bool      `json:"isAnswer"`
+	Vote      *VoteCondensed
+}
+
 type Vote struct {
 	VoteID    uuid.UUID `json:"voteId"`
 	CommentID uuid.UUID `json:"commentId"`
-	VoteValue int       `json:"voteCount"`
+	VoteValue int       `json:"voteValue"`
 	AuthorID  uuid.UUID `json:"authorId"`
+}
+
+type VoteCondensed struct {
+	VoteID    uuid.UUID `json:"voteId"`
+	VoteValue int       `json:"voteValue"`
+}
+
+type VoteSQL struct {
+	VoteID    uuid.UUID
+	CommentID uuid.UUID
+	VoteValue sql.NullInt32
+	AuthorID  uuid.UUID
 }
 
 type Tag struct {
@@ -76,14 +113,14 @@ func NewStandardUser(username, password string) (*User, error) {
 			Username:  username,
 			Password:  string(encryptedPwd),
 			Role:      "Standard",
-			CreatedAt: time.Now().Local().UTC(),
+			CreatedAt: getTimeNow(),
 		}, nil
 	}
 	return &User{
 		UserID:    uuid.New(),
 		Username:  username,
 		Role:      "Standard",
-		CreatedAt: time.Now().Local().UTC(),
+		CreatedAt: getTimeNow(),
 	}, nil
 
 }
@@ -105,7 +142,7 @@ func NewAdminUser(username, password string) (*User, error) {
 		Username:  username,
 		Password:  string(encryptedPwd),
 		Role:      "Admin",
-		CreatedAt: time.Now().Local().UTC(),
+		CreatedAt: getTimeNow(),
 	}, nil
 }
 
@@ -135,18 +172,124 @@ func NewThread(title, content string, authorId, tagId uuid.UUID) (*Thread, error
 		return nil, fmt.Errorf("thread tagID cannot be nil")
 	}
 	return &Thread{
-		ThreadID:  uuid.New(),
-		Title:     title,
-		Content:   content,
-		AuthorID:  authorId,
-		TagID:     tagId,
-		CreatedAt: time.Now().Local().UTC(),
-		UpdatedAt: time.Now().Local().UTC(),
+		ThreadID:     uuid.New(),
+		Title:        title,
+		Content:      content,
+		CommentCount: 0,
+		AuthorID:     authorId,
+		TagID:        tagId,
+		CreatedAt:    getTimeNow(),
+		UpdatedAt:    getTimeNow(),
 	}, nil
 }
 
-func (t *Thread) UpdateThread(title, content string) {
+func (t *Thread) UpdateThread(title, content string) error {
+	logInfo("Running UpdateThread")
+	if title == "" {
+		return fmt.Errorf("title cannot be empty")
+	}
+	if content == "" {
+		return fmt.Errorf("content cannot be empty")
+	}
 	t.Title = title
 	t.Content = content
-	t.UpdatedAt = time.Now().Local().UTC()
+	t.UpdatedAt = getTimeNow()
+	return nil
 }
+
+func NewComment(content string, threadID, authorId uuid.UUID) (*Comment, error) {
+	logInfo("Running NewComment")
+	if content == "" {
+		return nil, fmt.Errorf("comment content cannot be empty")
+	}
+	if threadID == uuid.Nil {
+		return nil, fmt.Errorf("thread threadID cannot be nil")
+	}
+	if authorId == uuid.Nil {
+		return nil, fmt.Errorf("thread authorID cannot be nil")
+	}
+	return &Comment{
+		CommentID: uuid.New(),
+		Content:   content,
+		VoteCount: 0,
+		AuthorID:  authorId,
+		ThreadID:  threadID,
+		CreatedAt: getTimeNow(),
+		UpdatedAt: getTimeNow(),
+		IsAnswer:  false,
+	}, nil
+}
+
+func (c *Comment) UpdateCommentContent(content string) error {
+	logInfo("Running UpdateCommentContent")
+	if content == "" {
+		fmt.Println("Lig")
+		return fmt.Errorf("content cannot be empty")
+	}
+	c.Content = content
+	c.UpdatedAt = getTimeNow()
+	return nil
+}
+
+func (c *Comment) UpdateCommentIsAnswer(isAnswer bool) error {
+	logInfo("Running UpdateCommentIsAnswer")
+	c.IsAnswer = isAnswer
+	return nil
+}
+
+func (c *Comment) UpdateCommentVoteCount(amt int) error {
+	logInfo("Running UpdateCommentContent")
+	if amt == 0 {
+		return fmt.Errorf("amt cannot be 0")
+	}
+	c.VoteCount += amt
+	return nil
+}
+
+func NewVote(commentId, authorId uuid.UUID, voteVal int) (*Vote, error) {
+	logInfo("Running NewVote")
+	if voteVal != 1 && voteVal != -1 {
+		return nil, fmt.Errorf("invalid vote value")
+	}
+	if commentId == uuid.Nil {
+		return nil, fmt.Errorf("vote commentID cannot be nil")
+	}
+	if authorId == uuid.Nil {
+		return nil, fmt.Errorf("vote authorID cannot be nil")
+	}
+	return &Vote{
+		VoteID:    uuid.New(),
+		VoteValue: voteVal,
+		CommentID: commentId,
+		AuthorID:  authorId,
+	}, nil
+}
+
+func (v *Vote) UpdateVoteValue(voteVal int) error {
+	logInfo("Running UpdateVoteValue")
+	if voteVal != 1 && voteVal != -1 {
+		return fmt.Errorf("invalid vote value: %d", voteVal)
+	}
+	v.VoteValue = voteVal
+	return nil
+}
+
+// func NewThreadTally(tagId uuid.UUID) (*ThreadTally, error) {
+// 	logInfo("Running NewThreadTally")
+// 	if tagId == uuid.Nil {
+// 		return nil, fmt.Errorf("tagID cannot be empty")
+// 	}
+// 	return &ThreadTally{
+// 		TagID: tagId,
+// 		Count: 0,
+// 	}, nil
+// }
+
+// func (tt *ThreadTally) UpdateThreadTally(amt int) error {
+// 	logInfo("Running UpdateThreadTally")
+// 	if amt == 0 {
+// 		return fmt.Errorf("amt cannot be 0")
+// 	}
+// 	tt.Count += amt
+// 	return nil
+// }
