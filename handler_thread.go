@@ -80,14 +80,14 @@ func (apiCfg *APIConfig) handlerUpdateThread(w http.ResponseWriter, r *http.Requ
 	//Check Thread Exists First
 	thread, err := apiCfg.DB.GetThreadByThreadID(threadId)
 	if err != nil {
-		logError(fmt.Sprintf("Unable to Get Thread [%d]", threadId), err)
+		logError(fmt.Sprintf("Unable to Get Thread [%s]", threadId.String()), err)
 		respondERROR(w, http.StatusBadRequest, "Failed to Update Thread: Invalid ThreadId")
 		return
 	}
 
 	//Validate User if they are the author of the thread
 	if thread.AuthorID != user.UserID {
-		logError(fmt.Sprintf("User [%d] does not have permission to edit Thread [%d]", user.UserID, threadId), err)
+		logError(fmt.Sprintf("User [%s] does not have permission to edit Thread [%s]", user.UserID.String(), threadId.String()), err)
 		PermissionDeniedRes(w)
 		return
 	}
@@ -95,7 +95,7 @@ func (apiCfg *APIConfig) handlerUpdateThread(w http.ResponseWriter, r *http.Requ
 	//Update Thread Details
 	err = thread.UpdateThread(req.Title, req.Content)
 	if err != nil {
-		logError(fmt.Sprintf("Unable to Update Thread [%d]", threadId), err)
+		logError(fmt.Sprintf("Unable to Update Thread [%s]", threadId.String()), err)
 		respondERROR(w, http.StatusBadRequest, "Failed to Update Thread: Invalid Thread Details")
 		return
 	}
@@ -126,14 +126,14 @@ func (apiCfg *APIConfig) handlerDeleteThread(w http.ResponseWriter, r *http.Requ
 	//Check Thread Exists First
 	thread, err := apiCfg.DB.GetThreadByThreadID(threadId)
 	if err != nil {
-		logError(fmt.Sprintf("Unable to Get Thread [%d]", threadId), err)
+		logError(fmt.Sprintf("Unable to Get Thread [%s]", threadId.String()), err)
 		respondERROR(w, http.StatusBadRequest, "Failed to Delete Thread: Invalid ThreadId")
 		return
 	}
 
 	//Validate User if they are the author of the thread OR an ADMIN
 	if thread.AuthorID != user.UserID && user.Role != "Admin" {
-		logError(fmt.Sprintf("User [%d] does not have permission to delete Thread [%d]", user.UserID, threadId), err)
+		logError(fmt.Sprintf("User [%s] does not have permission to delete Thread [%s]", user.UserID.String(), threadId.String()), err)
 		PermissionDeniedRes(w)
 		return
 	}
@@ -233,7 +233,7 @@ func (apiCfg *APIConfig) handlerGetTheadDetails(w http.ResponseWriter, r *http.R
 
 	thread, err := apiCfg.DB.GetThreadByThreadID(threadID)
 	if err != nil {
-		logError(fmt.Sprintf("Unable to Get Thread [%v]", threadID), err)
+		logError(fmt.Sprintf("Unable to Get Thread [%s]", threadID.String()), err)
 		respondERROR(w, http.StatusBadRequest, "Failed to Get Thread: Invalid ThreadId")
 		return
 	}

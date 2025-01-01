@@ -52,7 +52,7 @@ func (apiCfg *APIConfig) handlerUnVoteComment(w http.ResponseWriter, r *http.Req
 	//Update Comment Vote Count
 	err = apiCfg.DB.UpdateCommentVoteCountByCommentID(commentId, oppositeVoteValue)
 	if err != nil {
-		logError(fmt.Sprintf("UnvoteComment Handler - Unable to Update Comment [%d] Vote Count", commentId), err)
+		logError(fmt.Sprintf("UnvoteComment Handler - Unable to Update Comment [%s] Vote Count", commentId.String()), err)
 		respondERROR(w, http.StatusInternalServerError, "Failed to UnVote Comment")
 		return
 	}
@@ -119,7 +119,7 @@ func (apiCfg *APIConfig) handlerVoteComment(w http.ResponseWriter, r *http.Reque
 		//Update Vote Value
 		err = vote.UpdateVoteValue(voteVal)
 		if err != nil {
-			logError(fmt.Sprintf("Unable to Update Vote [%d]", vote.VoteID), err)
+			logError(fmt.Sprintf("Unable to Update Vote [%s]", vote.VoteID.String()), err)
 			respondERROR(w, http.StatusBadRequest, "Failed to Update Vote Value: Invalid Vote Details")
 			return
 		}
@@ -127,7 +127,7 @@ func (apiCfg *APIConfig) handlerVoteComment(w http.ResponseWriter, r *http.Reque
 		//Update Vote
 		err = apiCfg.DB.UpdateVoteVoteValue(vote)
 		if err != nil {
-			logError(fmt.Sprintf("Unable to Update Vote [%d] Value", commentId), err)
+			logError(fmt.Sprintf("Unable to Update Vote [%s] Value", commentId.String()), err)
 			respondERROR(w, http.StatusInternalServerError, "Failed to Update Vote Value")
 			return
 		}
@@ -139,7 +139,7 @@ func (apiCfg *APIConfig) handlerVoteComment(w http.ResponseWriter, r *http.Reque
 		//Check Comment Exists First
 		comment, err := apiCfg.DB.GetCommentByCommentID(commentId)
 		if err != nil {
-			logError(fmt.Sprintf("Unable to Get Comment [%d]", commentId), err)
+			logError(fmt.Sprintf("Unable to Get Comment [%s]", commentId.String()), err)
 			respondERROR(w, http.StatusBadRequest, "Failed to Update Comment: Invalid CommentId")
 			return
 		}
@@ -165,7 +165,7 @@ func (apiCfg *APIConfig) handlerVoteComment(w http.ResponseWriter, r *http.Reque
 	//Update Comment Vote Count for last 2 cases
 	err = apiCfg.DB.UpdateCommentVoteCountByCommentID(commentId, voteVal)
 	if err != nil {
-		logError(fmt.Sprintf("Unable to Update Comment [%d] Vote Count", commentId), err)
+		logError(fmt.Sprintf("Unable to Update Comment [%s] Vote Count", commentId.String()), err)
 		respondERROR(w, http.StatusInternalServerError, "Failed to Update Comment")
 		return
 	}
@@ -195,7 +195,7 @@ func (apiCfg *APIConfig) handlerCreateComment(w http.ResponseWriter, r *http.Req
 	//Check whether thread exists
 	_, err = apiCfg.DB.GetThreadByThreadID(threadID)
 	if err != nil {
-		logError(fmt.Sprintf("Thread [%v] does not exist", threadID), err)
+		logError(fmt.Sprintf("Thread [%s] does not exist", threadID.String()), err)
 		respondERROR(w, http.StatusBadRequest, "Failed to Create Comment, Invalid ThreadId")
 		return
 	}
@@ -219,7 +219,7 @@ func (apiCfg *APIConfig) handlerCreateComment(w http.ResponseWriter, r *http.Req
 	//Update Thead Comment Count
 	err = apiCfg.DB.UpdateThreadCommentCountByThreadID(threadID, 1)
 	if err != nil {
-		logError(fmt.Sprintf("Unable to Update Thead [%v] Comment Count", threadID), err)
+		logError(fmt.Sprintf("Unable to Update Thead [%s] Comment Count", threadID.String()), err)
 		respondERROR(w, http.StatusInternalServerError, "Something Went Wrong")
 		return
 	}
@@ -265,7 +265,7 @@ func (apiCfg *APIConfig) handlerGetAllComments(w http.ResponseWriter, r *http.Re
 	//Check whether thread exists
 	_, err = apiCfg.DB.GetThreadByThreadID(threadID)
 	if err != nil {
-		logError(fmt.Sprintf("Thread [%v] does not exist", threadID), err)
+		logError(fmt.Sprintf("Thread [%s] does not exist", threadID.String()), err)
 		respondERROR(w, http.StatusBadRequest, "Failed to Create Comment, Invalid ThreadId")
 		return
 	}
@@ -273,7 +273,7 @@ func (apiCfg *APIConfig) handlerGetAllComments(w http.ResponseWriter, r *http.Re
 	comments, commentCount, err := apiCfg.DB.GetAllCommentsByThreadIDWithVotesByUserID(count, page, threadID, user.UserID)
 	// comments, commentCount, err := apiCfg.DB.GetAllCommentsByThreadID(count, page, threadID)
 	if err != nil {
-		logError(fmt.Sprintf("Unable to Get Comments: Page[%d] Count[%d] ThreadID[%v]", page, count, threadID), err)
+		logError(fmt.Sprintf("Unable to Get Comments: Page[%d] Count[%d] ThreadID[%s]", page, count, threadID.String()), err)
 		respondERROR(w, http.StatusInternalServerError, "Failed to Get Comments")
 		return
 	}
@@ -309,14 +309,14 @@ func (apiCfg *APIConfig) handlerUpdateComment(w http.ResponseWriter, r *http.Req
 	//Check Comment Exists First
 	comment, err := apiCfg.DB.GetCommentByCommentID(commentId)
 	if err != nil {
-		logError(fmt.Sprintf("Unable to Get Comment [%d]", commentId), err)
+		logError(fmt.Sprintf("Unable to Get Comment [%s]", commentId.String()), err)
 		respondERROR(w, http.StatusBadRequest, "Failed to Update Comment: Invalid CommentId")
 		return
 	}
 
 	//Validate User if they are the author of the comment
 	if comment.AuthorID != user.UserID {
-		logError(fmt.Sprintf("User [%d] does not have permission to edit Comment [%d]", user.UserID, commentId), err)
+		logError(fmt.Sprintf("User [%s] does not have permission to edit Comment [%s]", user.UserID.String(), commentId.String()), err)
 		PermissionDeniedRes(w)
 		return
 	}
@@ -324,14 +324,14 @@ func (apiCfg *APIConfig) handlerUpdateComment(w http.ResponseWriter, r *http.Req
 	//Update Comment Details
 	err = comment.UpdateCommentContent(req.Content)
 	if err != nil {
-		logError(fmt.Sprintf("Unable to Update Comment [%d]", commentId), err)
+		logError(fmt.Sprintf("Unable to Update Comment [%s]", commentId.String()), err)
 		respondERROR(w, http.StatusBadRequest, "Failed to Update Comment: Invalid Comment Details")
 		return
 	}
 
 	err = apiCfg.DB.UpdateCommentContent(comment)
 	if err != nil {
-		logError(fmt.Sprintf("Unable to Update Comment [%d]", commentId), err)
+		logError(fmt.Sprintf("Unable to Update Comment [%s]", commentId.String()), err)
 		respondERROR(w, http.StatusInternalServerError, "Failed to Update Comment")
 		return
 	}
@@ -371,7 +371,7 @@ func (apiCfg *APIConfig) handlerMarkCommentAsAnswer(w http.ResponseWriter, r *ht
 	//Check Comment Exists First
 	comment, err := apiCfg.DB.GetCommentByCommentID(commentId)
 	if err != nil {
-		logError(fmt.Sprintf("Unable to Get Comment [%d]", commentId), err)
+		logError(fmt.Sprintf("Unable to Get Comment [%s]", commentId.String()), err)
 		respondERROR(w, http.StatusBadRequest, "Failed to Mark Comment as Answer: Invalid CommentId")
 		return
 	}
@@ -379,14 +379,14 @@ func (apiCfg *APIConfig) handlerMarkCommentAsAnswer(w http.ResponseWriter, r *ht
 	//Get Thread AuthorID
 	thread, err := apiCfg.DB.GetThreadByThreadID(comment.ThreadID)
 	if err != nil {
-		logError(fmt.Sprintf("Unable to Get Thread [%d] to Mark Comment as Correct", comment.ThreadID), err)
+		logError(fmt.Sprintf("Unable to Get Thread [%s] to Mark Comment as Correct", comment.ThreadID.String()), err)
 		respondERROR(w, http.StatusBadRequest, "Failed to Mark Comment as Answer: Invalid CommentId")
 		return
 	}
 
 	//Validate User if they are the author of the thread !!!!
 	if thread.AuthorID != user.UserID {
-		logError(fmt.Sprintf("User [%d] does not have permission to Mark Comment [%d] as Correct", user.UserID, commentId), err)
+		logError(fmt.Sprintf("User [%s] does not have permission to Mark Comment [%s] as Correct", user.UserID.String(), commentId.String()), err)
 		PermissionDeniedRes(w)
 		return
 	}
@@ -400,7 +400,7 @@ func (apiCfg *APIConfig) handlerMarkCommentAsAnswer(w http.ResponseWriter, r *ht
 	//Update Comment Details
 	err = comment.UpdateCommentIsAnswer(isAnswer)
 	if err != nil {
-		logError(fmt.Sprintf("Unable to Mark Comment [%d] as Answer", commentId), err)
+		logError(fmt.Sprintf("Unable to Mark Comment [%s] as Answer", commentId.String()), err)
 		respondERROR(w, http.StatusBadRequest, "Failed to Mark Comment as Answer: Invalid Comment Details")
 		return
 	}
@@ -431,14 +431,14 @@ func (apiCfg *APIConfig) handlerDeleteComment(w http.ResponseWriter, r *http.Req
 	//Check Comment Exists First
 	comment, err := apiCfg.DB.GetCommentByCommentID(commentId)
 	if err != nil {
-		logError(fmt.Sprintf("Unable to Get Comment [%d]", commentId), err)
+		logError(fmt.Sprintf("Unable to Get Comment [%s]", commentId.String()), err)
 		respondERROR(w, http.StatusBadRequest, "Failed to Delete Comment: Invalid CommentId")
 		return
 	}
 
 	//Validate User if they are the author of the thread OR an ADMIN
 	if comment.AuthorID != user.UserID && user.Role != "Admin" {
-		logError(fmt.Sprintf("User [%d] does not have permission to delete Comment [%d]", user.UserID, commentId), err)
+		logError(fmt.Sprintf("User [%s] does not have permission to delete Comment [%s]", user.UserID.String(), commentId.String()), err)
 		PermissionDeniedRes(w)
 		return
 	}
@@ -454,7 +454,7 @@ func (apiCfg *APIConfig) handlerDeleteComment(w http.ResponseWriter, r *http.Req
 	//Update Thead Comment Count
 	err = apiCfg.DB.UpdateThreadCommentCountByThreadID(comment.ThreadID, -1)
 	if err != nil {
-		logError(fmt.Sprintf("Unable to Update Thead [%v] Comment Count", comment.ThreadID), err)
+		logError(fmt.Sprintf("Unable to Update Thead [%s] Comment Count", comment.ThreadID.String()), err)
 		respondERROR(w, http.StatusInternalServerError, "Something Went Wrong")
 		return
 	}

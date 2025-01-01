@@ -113,7 +113,7 @@ func (s *PGStore) GetCommentByCommentID(commentId uuid.UUID) (*Comment, error) {
 	for rows.Next() {
 		return scanIntoComment(rows)
 	}
-	return nil, fmt.Errorf("comment [%v] not found", commentId)
+	return nil, fmt.Errorf("comment [%s] not found", commentId.String())
 }
 
 func (s *PGStore) UpdateCommentContent(comment *Comment) error {

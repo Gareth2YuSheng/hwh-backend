@@ -37,7 +37,7 @@ func (s *PGStore) GetVotesForCommentByUser(commentId, authorId uuid.UUID) (*Vote
 	for rows.Next() {
 		return scanIntoVote(rows)
 	}
-	return nil, fmt.Errorf("vote for comment [%v] by user [%v] not found", commentId, authorId)
+	return nil, fmt.Errorf("vote for comment [%s] by user [%s] not found", commentId.String(), authorId.String())
 }
 
 func (s *PGStore) UpdateVoteVoteValue(vote *Vote) error {

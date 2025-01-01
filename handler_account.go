@@ -78,12 +78,10 @@ func (apiCfg *APIConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Println("JWT token ", token) //remove later
 
-	res := LoginResponse{
+	respondOK(w, http.StatusOK, "Login Successful", LoginResponse{
 		UserID:      user.UserID,
 		Username:    user.Username,
 		Role:        user.Role,
 		AccessToken: token,
-	}
-
-	respondOK(w, http.StatusOK, "Login Successful", res)
+	})
 }

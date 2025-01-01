@@ -34,7 +34,7 @@ func (s *PGStore) GetUserByUserID(userID uuid.UUID) (*User, error) {
 	for rows.Next() {
 		return scanIntoUser(rows)
 	}
-	return nil, fmt.Errorf("user [%v] not found", userID)
+	return nil, fmt.Errorf("user [%s] not found", userID.String())
 }
 
 func (s *PGStore) GetUserByUsername(username string) (*User, error) {

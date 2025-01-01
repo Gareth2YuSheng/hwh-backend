@@ -72,7 +72,7 @@ func (s *PGStore) GetThreadByThreadID(threadId uuid.UUID) (*Thread, error) {
 	for rows.Next() {
 		return scanIntoThread(rows)
 	}
-	return nil, fmt.Errorf("thread [%v] not found", threadId)
+	return nil, fmt.Errorf("thread [%s] not found", threadId.String())
 }
 
 func (s *PGStore) UpdateThread(thread *Thread) error {
