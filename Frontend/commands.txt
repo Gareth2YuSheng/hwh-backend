@@ -1,0 +1,2 @@
+Create new React App using vite:
+npm create vite@latest
