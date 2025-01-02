@@ -1,2 +1,5 @@
 Create new React App using vite:
 npm create vite@latest
+
+Tutorial:
+https://www.youtube.com/watch?v=d4Y2DkKbxM0
