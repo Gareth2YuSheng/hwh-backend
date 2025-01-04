@@ -84,11 +84,11 @@ func (apiCfg *APIConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// LOGIN USER
+// GET USER DATA
 func (apiCfg *APIConfig) handlerGetUserData(w http.ResponseWriter, r *http.Request, user User) {
 	logInfo("Running handlerGetUserData")
 
-	respondOK(w, http.StatusOK, "Yesy", GetUserDataResponse{
-		User: user
+	respondOK(w, http.StatusOK, "", GetUserDataResponse{
+		User: user,
 	})
 }
