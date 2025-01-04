@@ -43,9 +43,11 @@ type VoteCommentRequest struct {
 //RESPONSES
 type LoginResponse struct {
 	UserID      uuid.UUID `json:"userId"`
-	Username    string    `json:"username"`
-	Role        string    `json:"role"`
 	AccessToken string    `json:"accessToken"`
+}
+
+type GetUserDataResponse struct {
+	User User `json:"user"`
 }
 
 type GetTagsResponse struct {

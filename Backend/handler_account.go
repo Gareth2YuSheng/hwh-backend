@@ -80,8 +80,15 @@ func (apiCfg *APIConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
 
 	respondOK(w, http.StatusOK, "Login Successful", LoginResponse{
 		UserID:      user.UserID,
-		Username:    user.Username,
-		Role:        user.Role,
 		AccessToken: token,
+	})
+}
+
+// LOGIN USER
+func (apiCfg *APIConfig) handlerGetUserData(w http.ResponseWriter, r *http.Request, user User) {
+	logInfo("Running handlerGetUserData")
+
+	respondOK(w, http.StatusOK, "Yesy", GetUserDataResponse{
+		User: user
 	})
 }

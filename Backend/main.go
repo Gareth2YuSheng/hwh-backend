@@ -66,6 +66,7 @@ func main() {
 	tagRouter := chi.NewRouter()
 
 	//Account Routes
+	accountRouter.Get("/user", apiCfg.middlewareAuth(apiCfg.handlerGetUserData))
 	accountRouter.Post("/register", apiCfg.handlerCreateUser)
 	accountRouter.Post("/login", apiCfg.handlerLogin)
 
