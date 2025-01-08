@@ -32,7 +32,7 @@ export default function MyNavBar() {
             </NavDropdown.Item>
             </NavDropdown> */}
           </Nav>
-          <Navbar.Collapse className="justify-content-end">
+          <Navbar.Collapse className="justify-content-end mt-3 mb-2">
             <Navbar.Text>
               Signed in as: <a href="#login">Robin Banks</a>
             </Navbar.Text>
