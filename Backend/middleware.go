@@ -39,6 +39,8 @@ func (apiCfg *APIConfig) middlewareAuth(handler authenticatedHandler) http.Handl
 			return
 		}
 
+		//Check whether token has expired
+
 		userId, err := GetUserIDFromJWT(token)
 		if err != nil {
 			logError("Error Retrieving UserID from JWT", err)

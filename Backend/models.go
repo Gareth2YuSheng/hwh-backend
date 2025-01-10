@@ -27,12 +27,26 @@ type Thread struct {
 	UpdatedAt    time.Time `json:"updatedAt"`
 }
 
+type ThreadDetails struct {
+	ThreadID     uuid.UUID `json:"threadId"`
+	Title        string    `json:"title"`
+	Content      string    `json:"content"`
+	CommentCount int       `json:"commentCount"`
+	AuthorID     uuid.UUID `json:"authorId"`
+	Author       string    `json:"author"`
+	TagID        uuid.UUID `json:"tagId"`
+	TagName      string    `json:"tagName"`
+	CreatedAt    time.Time `json:"createdAt"`
+	UpdatedAt    time.Time `json:"updatedAt"`
+}
+
 type ThreadCondensed struct {
 	ThreadID     uuid.UUID `json:"threadId"`
 	Title        string    `json:"title"`
 	CommentCount int       `json:"commentCount"`
-	AuthorID     uuid.UUID `json:"authorId"`
+	Author       string    `json:"author"`
 	TagID        uuid.UUID `json:"tagId"`
+	TagName      string    `json:"tagName"`
 	CreatedAt    time.Time `json:"createdAt"`
 }
 

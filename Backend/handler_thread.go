@@ -231,7 +231,7 @@ func (apiCfg *APIConfig) handlerGetTheadDetails(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	thread, err := apiCfg.DB.GetThreadByThreadID(threadID)
+	thread, err := apiCfg.DB.GetThreadDetailsByThreadID(threadID)
 	if err != nil {
 		logError(fmt.Sprintf("Unable to Get Thread [%s]", threadID.String()), err)
 		respondERROR(w, http.StatusBadRequest, "Failed to Get Thread: Invalid ThreadId")

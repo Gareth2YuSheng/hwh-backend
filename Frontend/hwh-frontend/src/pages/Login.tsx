@@ -14,15 +14,9 @@ export default function Login() {
 
   const navigate = useNavigate();
 
-  const submit = async (event: SyntheticEvent) => {
+  const handleSubmit = async (event: SyntheticEvent) => {
     event.preventDefault();
     setAlertVisible(false);
-    console.log("Username:",username, "| Pwd:", password)
-    // if (password !== confirmPassword) {
-    //   setAlertMessage("Passwords Do No Match!");
-    //   setAlertVisible(true);
-    //   return;
-    // }
 
     try {
       const response = await fetch(`http://localhost:8080/account/login`, {
@@ -51,7 +45,7 @@ export default function Login() {
   return (
     <>
       {alertVisible && alertMessage !== "" && <Alert variant="danger">{alertMessage}</Alert>}
-      <Form style={{minWidth: 400}} onSubmit={submit}>
+      <Form style={{}} onSubmit={handleSubmit}>
         <h1 className="mb-4">Login</h1>
         <FloatingLabel 
           controlId="floatingInput"
@@ -68,7 +62,7 @@ export default function Login() {
           label="Password"
           className="mb-3"
         >
-          <Form.Control type="password" placeholder="Password" 
+          <Form.Control type="password" placeholder="Password"
             value={password} 
             onChange={e => setPassword(e.target.value)}
             />

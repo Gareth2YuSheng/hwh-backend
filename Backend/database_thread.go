@@ -29,18 +29,13 @@ func (s *PGStore) CreateThread(thread *Thread) error {
 
 func (s *PGStore) GetAllThreads(count, page int, search string, tagID uuid.UUID) ([]*ThreadCondensed, int, error) {
 	logInfo("Running GetAllThreads")
-	query := `SELECT threadID, title, commentCount, authorID, tagID, createdAt, count(*) OVER() AS totalCount FROM threads`
-	if search != "" || tagID != uuid.Nil {
-		query += ` WHERE`
-	}
+	query := `SELECT threadID, title, commentCount, users.username, threads.tagID, tags.name, threads.createdAt, count(*) OVER() AS totalCount 
+	FROM threads, users, tags WHERE threads.authorId = users.userId AND tags.tagId = threads.tagId`
 	if search != "" {
-		query += ` title ILIKE '%` + search + `%'`
-	}
-	if search != "" && tagID != uuid.Nil {
-		query += ` AND`
+		query += ` AND title ILIKE '%` + search + `%'`
 	}
 	if tagID != uuid.Nil {
-		query += fmt.Sprintf(` tagID = '%v'`, tagID)
+		query += fmt.Sprintf(` AND tagID = '%v'`, tagID)
 	}
 	query += fmt.Sprintf(` ORDER BY createdAt DESC OFFSET %d LIMIT %d;`, (page-1)*count, count)
 
@@ -71,6 +66,20 @@ func (s *PGStore) GetThreadByThreadID(threadId uuid.UUID) (*Thread, error) {
 	}
 	for rows.Next() {
 		return scanIntoThread(rows)
+	}
+	return nil, fmt.Errorf("thread [%s] not found", threadId.String())
+}
+
+func (s *PGStore) GetThreadDetailsByThreadID(threadId uuid.UUID) (*ThreadDetails, error) {
+	logInfo("Running GetThreadDetailsByThreadID")
+	query := `SELECT threadId, title, content, commentCount, authorId, username, threads.tagId, name, threads.createdAt, threads.updatedAt
+	 FROM threads, tags, users WHERE threads.authorId = users.userId AND tags.tagId = threads.tagId AND threadID = $1;`
+	rows, err := s.DB.Query(query, threadId)
+	if err != nil {
+		return nil, err
+	}
+	for rows.Next() {
+		return scanIntoThreadDetails(rows)
 	}
 	return nil, fmt.Errorf("thread [%s] not found", threadId.String())
 }
@@ -128,6 +137,22 @@ func scanIntoThread(rows *sql.Rows) (*Thread, error) {
 	return thread, err
 }
 
+func scanIntoThreadDetails(rows *sql.Rows) (*ThreadDetails, error) {
+	thread := new(ThreadDetails)
+	err := rows.Scan(
+		&thread.ThreadID,
+		&thread.Title,
+		&thread.Content,
+		&thread.CommentCount,
+		&thread.AuthorID,
+		&thread.Author,
+		&thread.TagID,
+		&thread.TagName,
+		&thread.CreatedAt,
+		&thread.UpdatedAt)
+	return thread, err
+}
+
 func scanIntoGetThreads(rows *sql.Rows) (*GetThread, error) {
 	getThread := new(GetThread)
 	thread := new(ThreadCondensed)
@@ -136,8 +161,9 @@ func scanIntoGetThreads(rows *sql.Rows) (*GetThread, error) {
 		&thread.ThreadID,
 		&thread.Title,
 		&thread.CommentCount,
-		&thread.AuthorID,
+		&thread.Author,
 		&thread.TagID,
+		&thread.TagName,
 		&thread.CreatedAt,
 		&getThread.Count)
 	return getThread, err

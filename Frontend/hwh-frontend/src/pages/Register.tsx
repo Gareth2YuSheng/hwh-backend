@@ -13,7 +13,7 @@ export default function Register() {
 
   const navigate = useNavigate();
 
-  const submit = async (event: SyntheticEvent) => {
+  const handleSubmit = async (event: SyntheticEvent) => {
     event.preventDefault();
     setAlertVisible(false);
     if (password !== confirmPassword) {
@@ -47,7 +47,7 @@ export default function Register() {
   return (
     <>
       {alertVisible && alertMessage !== "" && <Alert variant="danger">{alertMessage}</Alert>}
-      <Form style={{minWidth: 400}} onSubmit={submit}>
+      <Form style={{}} onSubmit={handleSubmit}>
         <h1 className="mb-4">Sign Up</h1>
         <FloatingLabel 
           controlId="floatingInput"
