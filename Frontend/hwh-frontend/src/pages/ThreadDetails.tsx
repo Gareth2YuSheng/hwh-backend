@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate, NavLink } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 //Redux
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store/store';
@@ -16,14 +16,13 @@ import ThreadDetailsCard from '../components/ThreadDetailsCard';
 export default function ThreadDetails() {
   const { user } = useSelector((state: RootState) => state.user);
   const { thread, isLoading } = useSelector((state: RootState) => state.thread);
-  const { error, totalComments } = useSelector((state: RootState) => state.comment);
+  const { error, comment, totalComments } = useSelector((state: RootState) => state.comment);
   const dispatch = useDispatch<AppDispatch>();
-
-  // const { threadId } = useParams();
 
   const navigate = useNavigate();
 
-  const [modalDeleteThreadVisible, setModalDeleteThreadVisible] = useState(false);
+  const [modalDeleteVisible, setModalDeleteVisible] = useState(false);
+  const [modalDeleteMode, setModalDeleteMode] = useState<"THREAD" | "COMMENT" | "">("");
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertVariant, setAlertVariant] = useState("success");
@@ -74,9 +73,6 @@ export default function ThreadDetails() {
   },[totalComments, page]);
 
   const deleteThead = async () => {
-    if (user !== null && thread !== null && user.userId !== thread.authorId) {
-      return;
-    }
     setDisableDeleteButton(true);
     try {
       const response = await fetch(`http://localhost:8080/thread/${thread?.threadId}/delete`, {
@@ -88,7 +84,7 @@ export default function ThreadDetails() {
       });
       const content = await response.json();
       console.log(content)
-      setModalDeleteThreadVisible(false);
+      setModalDeleteVisible(false);
       if (content.success) {
         setAlertVariant("success");
         setAlertMessage("Thread Deleted Successfully");
@@ -110,37 +106,81 @@ export default function ThreadDetails() {
     }
   };
 
+  const deleteComment = async () => {
+    setDisableDeleteButton(true);
+    try {
+      const response = await fetch(`http://localhost:8080/comment/${comment?.commentId}/delete`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      const content = await response.json();
+      console.log(content)
+      setModalDeleteVisible(false);
+      if (content.success) {
+        setAlertVariant("success");
+        setAlertMessage("Comment Deleted Successfully");
+        setAlertVisible(true);
+        setTimeout(() => navigate(`/`), 1000);
+      } else if (content.message.includes("Failed to Delete Comment")) {
+        setAlertMessage("Unable to Delete Comment, Something Went Wrong");
+        setAlertVariant("danger"); 
+        setAlertVisible(true); 
+        setDisableDeleteButton(false);
+      } else {
+        setAlertMessage("Something Went Wrong, Try Again Later");
+        setAlertVariant("danger");
+        setAlertVisible(true);
+        setDisableDeleteButton(false);
+      }
+    } catch (err) {
+      console.log("Error:", err);
+    }
+  };
+
   const getComments = () => {
     console.log("Fetching Posts - Page:", page, "Count:", count)
     dispatch(fetchCommentData({ token, page, count, threadId: thread?.threadId }));
   };
 
   const handleShowDeleteThreadModal = () => {
-    setModalDeleteThreadVisible(true);
+    setModalDeleteMode("THREAD");
+    setModalDeleteVisible(true);
   };
 
-  const handleCloseDeleteThreadModal = () => {
-    setModalDeleteThreadVisible(false);
+  const handleShowDeleteCommentModal = () => {
+    setModalDeleteMode("COMMENT");
+    setModalDeleteVisible(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setModalDeleteVisible(false);
   };
 
   if (isLoading) {
-    return <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+    return <div className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
       <Spinner animation="border" />
     </div>;
   }
 
   return (
     <>
-      <Modal show={modalDeleteThreadVisible} onHide={handleCloseDeleteThreadModal}>
+      <Modal show={modalDeleteVisible} onHide={handleCloseDeleteModal}>
         <Modal.Header closeButton>
-          <Modal.Title>Delete Thread</Modal.Title>
+          <Modal.Title>{modalDeleteMode === "THREAD" ? "Delete Thread" : "Delete Comment"}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Are you sure you want to delete this thread?
+          {modalDeleteMode === "THREAD" ? 
+            "Are you sure you want to delete this thread?" : 
+            "Are you sure you want to delete this comment?"}          
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseDeleteThreadModal}>Cancel</Button>
-          <Button variant="danger" disabled={disableDeleteButton} onClick={deleteThead}>Delete Thead</Button>
+          <Button variant="secondary" onClick={handleCloseDeleteModal}>Cancel</Button>
+          <Button variant="danger" disabled={disableDeleteButton} 
+            onClick={modalDeleteMode === "THREAD" ? deleteThead : deleteComment}
+          >Delete</Button>
         </Modal.Footer>
       </Modal>
       
@@ -151,7 +191,7 @@ export default function ThreadDetails() {
         updateThreadNavigation={() => navigate(`/updateThread`)}
         createCommentNavigation={() => navigate(`/createComment`)} /> 
 
-      <DisplayComments navigate={navigate} />
+      <DisplayComments navigate={navigate} handleShowDeleteModal={handleShowDeleteCommentModal} />
       <div className="mt-4 d-flex justify-content-center">
         <Pagination>{paginationItems}</Pagination>
       </div>

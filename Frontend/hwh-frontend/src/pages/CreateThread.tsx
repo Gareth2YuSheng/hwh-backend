@@ -1,6 +1,6 @@
 import { useState, useEffect, SyntheticEvent } from "react";
 import { Form, FloatingLabel, Button, Alert, Modal, Badge } from "react-bootstrap";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 //Redux
 import { useDispatch, useSelector } from 'react-redux';

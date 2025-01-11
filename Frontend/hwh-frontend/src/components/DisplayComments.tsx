@@ -27,6 +27,11 @@ export default function DisplayComments({ navigate, handleShowDeleteModal } : Pr
     navigate(`/updateComment`);
   };
 
+  const handleDeleteComment = (index: number) => {
+    dispatch(selectComment({index}));
+    handleShowDeleteModal?.();
+  };
+
   return (
     <>
       {comments.length > 0 ? <div className="mt-4">
@@ -35,7 +40,7 @@ export default function DisplayComments({ navigate, handleShowDeleteModal } : Pr
             comment={comment} 
             index={index}
             updateCommentNavigation={handleUpdateComment}
-            handleShowDeleteModal={handleShowDeleteModal}/>;
+            handleDeleteComment={() => handleDeleteComment?.(index)}/>;
         })}
       </div> : 
       <div>

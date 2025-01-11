@@ -18,11 +18,11 @@ import formatDateFromUTC from "../helpers/formatDateFromUTC";
 interface Props {
   comment: Comment;
   index: number;
-  handleShowDeleteModal?: () => void;
+  handleDeleteComment?: () => void;
   updateCommentNavigation?: (n: number) => void;
 }
 
-export default function CommentCard({ comment, index, handleShowDeleteModal, updateCommentNavigation } : Props) {
+export default function CommentCard({ comment, index, handleDeleteComment, updateCommentNavigation } : Props) {
   const { user } = useSelector((state: RootState) => state.user);
 
   const [voteStatus, setVoteStatus] = useState(0);
@@ -76,7 +76,7 @@ export default function CommentCard({ comment, index, handleShowDeleteModal, upd
             </Card.Text>
             {user !== null && <div className="mb-2">
               {user.userId === comment.authorId && <Button className="mx-2" onClick={() => updateCommentNavigation?.(index)} ><EditIcon/></Button>}
-              {(user.role === "Admin" || user.userId === comment.authorId) && <Button variant="danger" onClick={() => {}}><DeleteIcon/></Button>}
+              {(user.role === "Admin" || user.userId === comment.authorId) && <Button variant="danger" onClick={handleDeleteComment}><DeleteIcon/></Button>}
             </div>}
           </div>
           <Card.Text className="d-flex mb-2" style={{alignItems:"center"}}>
