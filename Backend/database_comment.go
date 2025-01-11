@@ -32,14 +32,13 @@ func (s *PGStore) GetAllCommentsByThreadIDWithVotesByUserID(count, page int, thr
 	query := `SELECT c.commentID, c.content, c.voteCount, 
 	c.authorID, u.username, c.threadID, c.createdAt, c.updatedAt, 
 	c.isAnswer, v.voteID, v.voteValue, 
-	count(*) OVER() AS totalCount FROM users AS u, comments AS c
-	LEFT JOIN votes AS v ON c.commentID = v.commentID
-	WHERE u.userId = c.authorId AND c.threadID = $1
-	AND (v.authorID IS NULL OR v.authorID = $2)
+	count(*) OVER() AS totalCount FROM comments AS c JOIN users AS u ON c.authorId = u.userId
+	LEFT JOIN votes AS v ON c.commentID = v.commentID AND v.authorId = $1
+	WHERE u.userId = c.authorId AND c.threadID = $2
 	ORDER BY c.isAnswer DESC, c.voteCount DESC, c.createdAt ASC 
 	OFFSET $3 LIMIT $4`
 
-	rows, err := s.DB.Query(query, threadId, userId, (page-1)*count, count)
+	rows, err := s.DB.Query(query, userId, threadId, (page-1)*count, count)
 	if err != nil {
 		return nil, 0, err
 	}

@@ -63,7 +63,7 @@ func (s *PGStore) seedUserTable() {
 		logError("unable to Create Admin User", err)
 	}
 
-	user, err := NewStandardUser("John Doe", "ligma")
+	user, err := NewStandardUser("John Doe", "password")
 	if err != nil {
 		logError("Error Creating New Standard User Template", err)
 	}
