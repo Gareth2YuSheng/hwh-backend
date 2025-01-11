@@ -23,32 +23,28 @@ interface CommentsState {
   totalComments: number;
   isLoading: boolean;
   error: string | null;
+  comment: Comment | null;
 }
 
 const initialState: CommentsState = {
   comments: [],
   totalComments: 0,
   isLoading: false,
-  error: null
+  error: null,
+  comment: null
 }
 
-export const fetchCommentData = createAsyncThunk("thread/fetchCommentData", async ({ token, page, count, tagId, search }: 
-  { token: string | undefined, page: number, count: number, tagId: string, search: string }) => {
-  let url = `http://localhost:8080/thread/all?count=${count}&page=${page}`;
-  if (tagId != "") {
-    url += `&tagId=${tagId}`;
-  }
-  if (search != "") {
-    url += `&search=${search}`;
-  }
+export const fetchCommentData = createAsyncThunk("thread/fetchCommentData", async ({ token, page, count, threadId }: 
+  { token: string | undefined, page: number, count: number, threadId: string | undefined }) => {
   try {
-    const response = await fetch(url, {
+    const response = await fetch(`http://localhost:8080/comment/${threadId}?count=${count}&page=${page}`, {
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
       }
     });
     const content = await response.json();
+    console.log(content.data)
     return content.data;
   } catch (err) {
     console.log("Error:", err);
@@ -59,16 +55,9 @@ export const commentSlice = createSlice({
   name: "comment",
   initialState: initialState,
   reducers: {
-    // addHabit: (state, action:PayloadAction<{name:string; frequency:"daily"|"weekly"}>) => {
-    //   const newHabit: Habit = {
-    //     id: Date.now().toString(),
-    //     name: action.payload.name,
-    //     frequency: action.payload.frequency,
-    //     completedDates: [],
-    //     createdAt: new Date().toISOString(),
-    //   }
-    //   state.habits.push(newHabit);
-    // },
+    selectComment: (state, action:PayloadAction<{ index: number; }>) => {
+      state.comment = state.comments[action.payload.index];
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -91,6 +80,6 @@ export const commentSlice = createSlice({
   }
 });
 
-export const {  } = commentSlice.actions;
+export const { selectComment } = commentSlice.actions;
 
 export default commentSlice.reducer;

@@ -1,25 +1,25 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, NavLink } from 'react-router-dom';
 //Redux
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store/store';
 import { fetchThreadDetails } from "../store/threadSlice";
+import { fetchCommentData } from '../store/commentsSlice';
+import { fetchUserData } from '../store/userSlice';
 
-import { Spinner, Card, Badge, Button, Modal, Alert } from "react-bootstrap";
-import CommentIcon from '@mui/icons-material/Comment';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-
-import formatDateFromUTC from "../helpers/formatDateFromUTC";
-import Cookies from "js-cookie";
+import { Spinner, Button, Modal, Alert, Pagination } from "react-bootstrap";
 import DisplayComments from '../components/DisplayComments';
+
+import Cookies from "js-cookie";
+import ThreadDetailsCard from '../components/ThreadDetailsCard';
 
 export default function ThreadDetails() {
   const { user } = useSelector((state: RootState) => state.user);
   const { thread, isLoading } = useSelector((state: RootState) => state.thread);
+  const { error, totalComments } = useSelector((state: RootState) => state.comment);
   const dispatch = useDispatch<AppDispatch>();
 
-  const { threadId } = useParams();
+  // const { threadId } = useParams();
 
   const navigate = useNavigate();
 
@@ -28,6 +28,9 @@ export default function ThreadDetails() {
   const [alertMessage, setAlertMessage] = useState("");
   const [alertVariant, setAlertVariant] = useState("success");
   const [disableDeleteButton, setDisableDeleteButton] = useState(false);
+  const [page, setPage] = useState(1);
+  const [count, setCount] = useState(5);
+  const [paginationItems, setPaginationItems] = useState<JSX.Element[]>([]);
 
   const token = Cookies.get("hwh-jwt");
 
@@ -37,12 +40,38 @@ export default function ThreadDetails() {
       navigate("/login");
       return;
     }
-    if (user === null) {
-      navigate("/");
+    if (thread === null) {
+      navigate(-1);
       return;
     }
-    dispatch(fetchThreadDetails({token, threadId}));
-  }, [])
+    if (user === null) {
+      dispatch(fetchUserData(token)); 
+    } 
+    dispatch(fetchThreadDetails({token, threadId: thread?.threadId}));
+  }, []);
+
+  useEffect(() => {
+    getComments();    
+  },[page, count]);
+
+  useEffect(() => {
+    if (error) {
+      setAlertVariant("danger");
+      setAlertMessage(error);
+      setAlertVisible(true);
+    }    
+  }, [error]);
+
+  useEffect(() => {
+    let newPaginationItems = [];
+    for (let num = 1; num < Math.ceil(totalComments/count)+1; num++) {
+      newPaginationItems.push(
+        <Pagination.Item key={num} active={num === page} onClick={() => setPage(num)}>
+          {num}
+        </Pagination.Item>);
+    }
+    setPaginationItems(newPaginationItems);
+  },[totalComments, page]);
 
   const deleteThead = async () => {
     if (user !== null && thread !== null && user.userId !== thread.authorId) {
@@ -50,7 +79,7 @@ export default function ThreadDetails() {
     }
     setDisableDeleteButton(true);
     try {
-      const response = await fetch(`http://localhost:8080/thread/${threadId}/delete`, {
+      const response = await fetch(`http://localhost:8080/thread/${thread?.threadId}/delete`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -58,6 +87,7 @@ export default function ThreadDetails() {
         }
       });
       const content = await response.json();
+      console.log(content)
       setModalDeleteThreadVisible(false);
       if (content.success) {
         setAlertVariant("success");
@@ -80,6 +110,11 @@ export default function ThreadDetails() {
     }
   };
 
+  const getComments = () => {
+    console.log("Fetching Posts - Page:", page, "Count:", count)
+    dispatch(fetchCommentData({ token, page, count, threadId: thread?.threadId }));
+  };
+
   const handleShowDeleteThreadModal = () => {
     setModalDeleteThreadVisible(true);
   };
@@ -89,7 +124,9 @@ export default function ThreadDetails() {
   };
 
   if (isLoading) {
-    return <Spinner animation="border" />;
+    return <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+      <Spinner animation="border" />
+    </div>;
   }
 
   return (
@@ -109,35 +146,15 @@ export default function ThreadDetails() {
       
       {alertVisible && alertMessage !== "" && <Alert variant={alertVariant}>{alertMessage}</Alert>}
 
-      {thread !== null ? <>
-      <Card style={{}} className="shadow-sm mb-4">
-        <Card.Body>
-          <div className="d-flex justify-content-between align-items-stretch flex-wrap">
-            <Card.Text style={{marginBottom:7}}>
-              <Badge bg="success" className="" style={{marginRight:10}}>{thread.tagName}</Badge>
-              <b>{thread.author}</b> - {thread.createdAt === thread.updatedAt ? formatDateFromUTC(thread.createdAt) : "Updated " + formatDateFromUTC(thread.updatedAt)}
-            </Card.Text>
-            {user !== null && <div className="mb-2">
-              {user.userId === thread.authorId && <Button className="mx-2" onClick={() => navigate(`/updateThread/${threadId}`)} ><EditIcon/></Button>}
-              {user.role === "Admin" && <Button variant="danger" onClick={handleShowDeleteThreadModal}><DeleteIcon/></Button>}
-            </div>}
-          </div>          
-          <Card.Title><h2>{thread.title}</h2></Card.Title>
-          <Card.Text>
-            {thread.content}
-          </Card.Text>
-          <Card.Text>
-            <CommentIcon style={{marginRight:"5px", marginTop:"-3px"}}/>{thread.commentCount}
-          </Card.Text>
-        </Card.Body>
-      </Card>
-      <DisplayComments />
-      </> : 
-      <Card style={{}} className="shadow-sm">
-        <Card.Body>
-          <Card.Title>No Thread Found</Card.Title>
-        </Card.Body>
-      </Card>}
+      <ThreadDetailsCard viewingDetails 
+        handleShowDeleteThreadModal={handleShowDeleteThreadModal} 
+        updateThreadNavigation={() => navigate(`/updateThread`)}
+        createCommentNavigation={() => navigate(`/createComment`)} /> 
+
+      <DisplayComments navigate={navigate} />
+      <div className="mt-4 d-flex justify-content-center">
+        <Pagination>{paginationItems}</Pagination>
+      </div>
     </>
   );
 };

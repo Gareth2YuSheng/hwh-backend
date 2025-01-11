@@ -72,16 +72,9 @@ export const threadSlice = createSlice({
   name: "thread",
   initialState: initialState,
   reducers: {
-    // addHabit: (state, action:PayloadAction<{name:string; frequency:"daily"|"weekly"}>) => {
-    //   const newHabit: Habit = {
-    //     id: Date.now().toString(),
-    //     name: action.payload.name,
-    //     frequency: action.payload.frequency,
-    //     completedDates: [],
-    //     createdAt: new Date().toISOString(),
-    //   }
-    //   state.habits.push(newHabit);
-    // },
+    selectThread: (state, action:PayloadAction<{ index: number; }>) => {
+      state.thread = state.threads[action.payload.index];
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -105,20 +98,20 @@ export const threadSlice = createSlice({
         console.log("Getting threads details pending");
         state.isLoading = true;
       })
+      .addCase(fetchThreadDetails.rejected, (state, action) => {
+        console.log("Getting threads details rejected");
+        state.isLoading = false;
+        state.error = action.error.message || "Failed to fetch thread details";
+      })
       .addCase(fetchThreadDetails.fulfilled, (state, action) => {
         console.log("Getting threads details fulfilled");
         state.error = null;
         state.isLoading = false;
         state.thread = action.payload.thread;
-      })
-      .addCase(fetchThreadDetails.rejected, (state, action) => {
-        console.log("Getting threads details rejected");
-        state.isLoading = false;
-        state.error = action.error.message || "Failed to fetch thread details";
       });
   }
 });
 
-export const {  } = threadSlice.actions;
+export const { selectThread } = threadSlice.actions;
 
 export default threadSlice.reducer;

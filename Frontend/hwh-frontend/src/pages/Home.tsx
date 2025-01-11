@@ -41,10 +41,9 @@ export default function Home() {
       navigate("/login");
       return;
     }
-    if (user !== null) {
-      return;
-    }   
-    dispatch(fetchUserData(token)); 
+    if (user === null) {
+      dispatch(fetchUserData(token)); 
+    }    
     getTags();
   }, []);
 
@@ -105,7 +104,7 @@ export default function Home() {
   }
 
   return (
-    <div style={{marginTop: 110}}>
+    <div>
       {alertVisible && alertMessage !== "" && <Alert variant="danger">{alertMessage}</Alert>}
 
       <div className="mt-5 mb-3">

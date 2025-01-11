@@ -1,38 +1,41 @@
+import { NavigateFunction } from 'react-router-dom';
 //Redux
-import { useSelector } from 'react-redux';
-import { RootState } from '../store/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../store/store';
+import { selectComment } from '../store/commentsSlice';
 
-import { Spinner, Card, Badge } from "react-bootstrap";
+import { Spinner, Card } from "react-bootstrap";
+import CommentCard from './CommentCard';
 
-import formatDateFromUTC from "../helpers/formatDateFromUTC";
+interface Props {
+  navigate: NavigateFunction;
+  handleShowDeleteModal?: () => void;
+}
 
-export default function DisplayComments() {
+export default function DisplayComments({ navigate, handleShowDeleteModal } : Props) {
   const { comments, isLoading } = useSelector((state: RootState) => state.comment);
+  const dispatch = useDispatch<AppDispatch>();
 
-  // if (isLoading) {
-  //   return <Spinner animation="border" />;
-  // }
+  if (isLoading) {
+    return <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+      <Spinner animation="border" />
+    </div>;
+  }
+
+  const handleUpdateComment = (index: number) => {
+    dispatch(selectComment({index}));
+    navigate(`/updateComment`);
+  };
 
   return (
     <>
       {comments.length > 0 ? <div className="mt-4">
         {comments.map((comment, index) => {
-          return <Card key={comment.commentId} style={{cursor:"pointer"}} 
-            className="mt-2 shadow-sm" onClick={() => {}}>
-            <Card.Body>
-              <Card.Title>{comment.content} 
-                {/* <Badge bg="success" className="mx-1">{thread.tagName}</Badge> */}
-              </Card.Title>
-              <Card.Text style={{marginBottom:7}}>
-                <b>{comment.author}</b> - {comment.createdAt === comment.updatedAt 
-                  ? formatDateFromUTC(comment.createdAt) : 
-                  "Updated " + formatDateFromUTC(comment.updatedAt)}
-              </Card.Text>
-              {/* <Card.Text>
-                <CommentIcon style={{marginRight:"5px", marginTop:"-3px"}}/>{thread.commentCount}
-              </Card.Text> */}
-            </Card.Body>
-          </Card>;
+          return <CommentCard key={index} 
+            comment={comment} 
+            index={index}
+            updateCommentNavigation={handleUpdateComment}
+            handleShowDeleteModal={handleShowDeleteModal}/>;
         })}
       </div> : 
       <div>

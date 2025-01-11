@@ -7,18 +7,20 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import MyNavBar from "./components/MyNavBar";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
-import Register from "./pages/Register";
 import CreateThread from "./pages/CreateThread";
 import ThreadDetails from "./pages/ThreadDetails";
+import CreateComment from "./pages/CreateComment";
 
 function App() {
   const location = useLocation();
 
   useEffect(() => {
-    if (location.pathname === "/") {
-      document.body.style.placeItems = "start"
+    if (location.pathname === "/" || location.pathname.startsWith("/threadDetails")) {
+      document.body.style.placeItems = "start";
+      document.body.style.paddingTop = "100px";
     } else {
-      document.body.style.placeItems = "center"
+      document.body.style.placeItems = "center";
+      document.body.style.paddingTop = "0px";
     }
   }, [location]);
 
@@ -27,11 +29,13 @@ function App() {
       <MyNavBar />
       <Routes>
         <Route path="/" Component={Home} />
-        <Route path="/login" Component={Login} />
-        <Route path="/register" Component={Register} />
-        <Route path="/createThread" Component={CreateThread} />
-        <Route path="/threadDetails/:threadId" Component={ThreadDetails} />
-        <Route path="/updateThread/:threadId" Component={CreateThread} />
+        <Route path="/login" element={<Login mode="LOGIN"/>} />
+        <Route path="/register" element={<Login mode="REGISTER"/>} />
+        <Route path="/createThread" element={<CreateThread mode="CREATE"/>} />
+        <Route path="/threadDetails" Component={ThreadDetails} />
+        <Route path="/updateThread" element={<CreateThread mode="UPDATE"/>} />
+        <Route path="/createComment" element={<CreateComment mode="CREATE"/>} />
+        <Route path="/updateComment" element={<CreateComment mode="UPDATE"/>} />
       </Routes>        
     </div>
   );

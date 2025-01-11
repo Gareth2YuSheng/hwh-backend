@@ -10,14 +10,16 @@ import { fetchTagData } from "../store/tagSlice";
 import Cookies from "js-cookie";
 import TagsDropdown from "../components/TagsDropdown";
 
+interface Props {
+  mode: "CREATE" | "UPDATE"
+}
 
-
-export default function CreateThread() {
+export default function CreateThread({ mode }: Props) {
   //Redux
   const { thread } = useSelector((state: RootState) => state.thread);
   const dispatch = useDispatch<AppDispatch>();
 
-  const { threadId } = useParams();
+  // const { threadId } = useParams();
   
   const navigate = useNavigate();
 
@@ -44,15 +46,13 @@ export default function CreateThread() {
       navigate("/login");
       return;
     }
-    if (thread === null) {
-      navigate("/");
-      return;
-    }
-    if (!threadId) {
+    if (mode === "CREATE") {
       getTags();
-    } else {
+    } else if (mode === "UPDATE" && thread) {
       setTitle(thread.title);
       setContent(thread.content);
+    } else if (mode === "UPDATE" && thread === null) {
+      navigate(-1);
     }
   }, []);
 
@@ -71,16 +71,16 @@ export default function CreateThread() {
       setAlertVisible(true);
       return;
     }
-    if (!threadId && selectedTagId === "") {
+    if (mode === "CREATE" && selectedTagId === "") {
       setAlertMessage("A Tag is Required for the thread!");
       setAlertVariant("danger");
       setAlertVisible(true);
       return;
     }
     setDisableSubmitBtn(true);
-    if (threadId) {
+    if (mode === "UPDATE") {
       try {
-        const response = await fetch(`http://localhost:8080/thread/${threadId}/update`, {
+        const response = await fetch(`http://localhost:8080/thread/${thread?.threadId}/update`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -111,7 +111,7 @@ export default function CreateThread() {
       } catch (err) {
         console.log("Error:", err);
       }
-    } else {
+    } else if (mode === "CREATE") {
       try {
         const response = await fetch(`http://localhost:8080/thread/create`, {
           method: "POST",
@@ -145,9 +145,7 @@ export default function CreateThread() {
       } catch (err) {
         console.log("Error:", err);
       }
-    }
-
-    
+    }   
   };
 
   const handleCreateNewTag = async (event: SyntheticEvent) => {
@@ -228,7 +226,7 @@ export default function CreateThread() {
 
       <Form style={{}} onSubmit={handleSubmit} autoComplete="off">
         <div className="d-flex mt-4 justify-content-between align-items-stretch flex-wrap">
-          {threadId ? <>
+          {mode === "UPDATE" ? <>
             <h2 className="mb-3">Update Thread</h2>
             <Badge style={{ alignSelf:"baseline", fontSize:"18px", padding:"13px" }} bg="success">{thread?.tagName}</Badge>
           </> : <>
@@ -257,7 +255,7 @@ export default function CreateThread() {
             onChange={e => setContent(e.target.value)}
             />
         </FloatingLabel>
-        <Button variant="warning" className="mb-2 w-100" type="submit" disabled={disableSubmitBtn}>{threadId ? "Update Thread" : "Create Thread"}</Button>
+        <Button variant="warning" className="mb-2 w-100" type="submit" disabled={disableSubmitBtn}>{mode === "UPDATE" ? "Update Thread" : "Create Thread"}</Button>
       </Form>
     </>
   );
