@@ -30,13 +30,13 @@ func (s *PGStore) CreateComment(comment *Comment) error {
 func (s *PGStore) GetAllCommentsByThreadIDWithVotesByUserID(count, page int, threadId, userId uuid.UUID) ([]*CommentWithVoteCondensed, int, error) {
 	logInfo("Running GetAllCommentsByThreadID")
 	query := `SELECT c.commentID, c.content, c.voteCount, 
-	c.authorID, c.threadID, c.createdAt, c.updatedAt, 
+	c.authorID, u.username, c.threadID, c.createdAt, c.updatedAt, 
 	c.isAnswer, v.voteID, v.voteValue, 
-	count(*) OVER() AS totalCount FROM comments AS c
+	count(*) OVER() AS totalCount FROM users AS u, comments AS c
 	LEFT JOIN votes AS v ON c.commentID = v.commentID
-	WHERE c.threadID = $1
+	WHERE u.userId = c.authorId AND c.threadID = $1
 	AND (v.authorID IS NULL OR v.authorID = $2)
-	ORDER BY c.isAnswer DESC, c.voteCount DESC,  c.createdAt ASC 
+	ORDER BY c.isAnswer DESC, c.voteCount DESC, c.createdAt ASC 
 	OFFSET $3 LIMIT $4`
 
 	rows, err := s.DB.Query(query, threadId, userId, (page-1)*count, count)
@@ -58,6 +58,7 @@ func (s *PGStore) GetAllCommentsByThreadIDWithVotesByUserID(count, page int, thr
 			Content:   getComment.Content,
 			VoteCount: getComment.VoteCount,
 			AuthorID:  getComment.AuthorID,
+			Author:    getComment.Author,
 			ThreadID:  getComment.ThreadID,
 			CreatedAt: getComment.CreatedAt,
 			UpdatedAt: getComment.UpdatedAt,
@@ -211,7 +212,7 @@ func scanIntoGetComments(rows *sql.Rows) (*GetComment, error) {
 
 func scanIntoGetCommentsWithVotes(rows *sql.Rows) (*GetCommentWithVoteSQL, error) {
 	getComment := new(GetCommentWithVoteSQL)
-	comment := new(Comment)
+	comment := new(CommentWithAuthor)
 	vote := new(VoteSQL)
 	getComment.Comment = comment
 	getComment.Vote = vote
@@ -221,6 +222,7 @@ func scanIntoGetCommentsWithVotes(rows *sql.Rows) (*GetCommentWithVoteSQL, error
 		&comment.Content,
 		&comment.VoteCount,
 		&comment.AuthorID,
+		&comment.Author,
 		&comment.ThreadID,
 		&comment.CreatedAt,
 		&comment.UpdatedAt,

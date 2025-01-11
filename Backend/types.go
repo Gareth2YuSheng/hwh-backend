@@ -86,7 +86,7 @@ type GetComment struct {
 }
 
 type GetCommentWithVoteSQL struct {
-	Comment *Comment
+	Comment *CommentWithAuthor
 	Vote    *VoteSQL
 	Count   int
 }

@@ -71,11 +71,24 @@ type Comment struct {
 	IsAnswer  bool      `json:"isAnswer"`
 }
 
+type CommentWithAuthor struct {
+	CommentID uuid.UUID `json:"commentId"`
+	Content   string    `json:"content"`
+	VoteCount int       `json:"voteCount"`
+	AuthorID  uuid.UUID `json:"authorId"`
+	Author    string    `json:"author"`
+	ThreadID  uuid.UUID `json:"threadId"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	IsAnswer  bool      `json:"isAnswer"`
+}
+
 type CommentWithVoteCondensed struct {
 	CommentID uuid.UUID `json:"commentId"`
 	Content   string    `json:"content"`
 	VoteCount int       `json:"voteCount"`
 	AuthorID  uuid.UUID `json:"authorId"`
+	Author    string    `json:"author"`
 	ThreadID  uuid.UUID `json:"threadId"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
