@@ -191,7 +191,10 @@ export default function ThreadDetails() {
         updateThreadNavigation={() => navigate(`/updateThread`)}
         createCommentNavigation={() => navigate(`/createComment`)} /> 
 
-      <DisplayComments navigate={navigate} handleShowDeleteModal={handleShowDeleteCommentModal} />
+      <DisplayComments 
+        navigate={navigate} 
+        handleShowDeleteModal={handleShowDeleteCommentModal} 
+        token={token}/>
       <div className="mt-4 d-flex justify-content-center">
         <Pagination>{paginationItems}</Pagination>
       </div>

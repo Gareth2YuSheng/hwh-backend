@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 //Redux
-import { useSelector } from 'react-redux';
-import { RootState } from '../store/store';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState, AppDispatch } from '../store/store';
+import { voteComment, markAnswerComment } from "../store/commentsSlice";
 
 import { Card, Badge, Button } from "react-bootstrap"
 import { Comment } from "../store/commentsSlice";
@@ -20,10 +21,13 @@ interface Props {
   index: number;
   handleDeleteComment?: () => void;
   updateCommentNavigation?: (n: number) => void;
+  token: string | undefined;
 }
 
-export default function CommentCard({ comment, index, handleDeleteComment, updateCommentNavigation } : Props) {
+export default function CommentCard({ comment, index, handleDeleteComment, updateCommentNavigation, token } : Props) {
   const { user } = useSelector((state: RootState) => state.user);
+  const { thread } = useSelector((state: RootState) => state.thread);
+  const dispatch = useDispatch<AppDispatch>();
 
   const [voteStatus, setVoteStatus] = useState(0);
 
@@ -37,17 +41,34 @@ export default function CommentCard({ comment, index, handleDeleteComment, updat
     if (voteStatus > 0) {
       unvoteComment();
       setVoteStatus(0);
+      dispatch(voteComment({ index, amt: -1 }));
     } else {
+      if (voteStatus === 0) {
+        dispatch(voteComment({ index, amt: 1 }));
+      } else if (voteStatus < 0) {
+        dispatch(voteComment({ index, amt: 2 }));
+      }
       upvoteComment();
       setVoteStatus(1);
     }
   };
 
   const handleDownvote = () => {
+    //If comment was already downvoted, unvote it
     if (voteStatus < 0) {
       unvoteComment();
       setVoteStatus(0);
+      dispatch(voteComment({ index, amt: 1 }));
     } else {
+    //If comment has not been downvoted, downvote it
+      //If comment was not voted before, voteCount -1
+      if (voteStatus === 0) {
+        dispatch(voteComment({ index, amt: -1 }));
+      }      
+      //Else if comment was upvoted before, voteCount -2
+      else if (voteStatus > 0) {
+        dispatch(voteComment({ index, amt: -2 }));
+      }
       downvoteComment();
       setVoteStatus(-1);
     }
@@ -55,14 +76,109 @@ export default function CommentCard({ comment, index, handleDeleteComment, updat
 
   const upvoteComment = async () => {
     console.log("Upvoting Comment")
+    try {
+      const response = await fetch(`http://localhost:8080/comment/${comment?.commentId}/vote`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          "voteType": "up"
+        })
+      });
+      const content = await response.json();
+      console.log(content)
+      // if (content.success) {
+      // } else {
+      // }
+    } catch (err) {
+      console.log("Error:", err);
+    }
   };
 
   const downvoteComment = async () => {
     console.log("Downvoting Comment")
+    try {
+      const response = await fetch(`http://localhost:8080/comment/${comment?.commentId}/vote`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          "voteType": "down"
+        })
+      });
+      const content = await response.json();
+      console.log(content)
+      // if (content.success) {
+      // } else {
+      // }
+    } catch (err) {
+      console.log("Error:", err);
+    }
   };
 
   const unvoteComment = async () => {
     console.log("Unvoting Comment")
+    try {
+      const response = await fetch(`http://localhost:8080/comment/${comment?.commentId}/unvote`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      const content = await response.json();
+      console.log(content)
+      // if (content.success) {
+      // } else {
+      // }
+    } catch (err) {
+      console.log("Error:", err);
+    }
+  };
+
+  const markCommentAsAnswer = async () => {
+    console.log("Marking comment as ans")
+    if (comment.isAnswer) { //unmark comment
+      dispatch(markAnswerComment({ index, isAns: false }));
+      try {
+        const response = await fetch(`http://localhost:8080/comment/${comment?.commentId}/answer?isAnswer=false`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          }
+        });
+        const content = await response.json();
+        console.log(content)
+        // if (content.success) {
+        // } else {
+        // }
+      } catch (err) {
+        console.log("Error:", err);
+      }
+    } else { //mark comment
+      dispatch(markAnswerComment({ index, isAns: true }));
+      try {
+        const response = await fetch(`http://localhost:8080/comment/${comment?.commentId}/answer?isAnswer=true`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          }
+        });
+        const content = await response.json();
+        console.log(content)
+        // if (content.success) {
+        // } else {
+        // }
+      } catch (err) {
+        console.log("Error:", err);
+      }
+    }
   };
   
   return (
@@ -75,7 +191,8 @@ export default function CommentCard({ comment, index, handleDeleteComment, updat
                 formatDateFromUTC(comment.createdAt) : "Edited " + formatDateFromUTC(comment.updatedAt)}
             </Card.Text>
             {user !== null && <div className="mb-2">
-              {user.userId === comment.authorId && <Button className="mx-2" onClick={() => updateCommentNavigation?.(index)} ><EditIcon/></Button>}
+              {thread !== null && user.userId === thread.authorId && <Button variant="success" className="" onClick={markCommentAsAnswer} >{comment.isAnswer ? "Unmark as Answer" : "Mark as Answer"}</Button>}
+              {user.userId === comment.authorId && <Button variant="primary" className="mx-2" onClick={() => updateCommentNavigation?.(index)} ><EditIcon/></Button>}
               {(user.role === "Admin" || user.userId === comment.authorId) && <Button variant="danger" onClick={handleDeleteComment}><DeleteIcon/></Button>}
             </div>}
           </div>

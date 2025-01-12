@@ -10,9 +10,10 @@ import CommentCard from './CommentCard';
 interface Props {
   navigate: NavigateFunction;
   handleShowDeleteModal?: () => void;
+  token: string | undefined;
 }
 
-export default function DisplayComments({ navigate, handleShowDeleteModal } : Props) {
+export default function DisplayComments({ navigate, handleShowDeleteModal, token } : Props) {
   const { comments, isLoading } = useSelector((state: RootState) => state.comment);
   const dispatch = useDispatch<AppDispatch>();
 
@@ -40,7 +41,9 @@ export default function DisplayComments({ navigate, handleShowDeleteModal } : Pr
             comment={comment} 
             index={index}
             updateCommentNavigation={handleUpdateComment}
-            handleDeleteComment={() => handleDeleteComment?.(index)}/>;
+            handleDeleteComment={() => handleDeleteComment?.(index)}
+            token={token}
+            />;
         })}
       </div> : 
       <div>

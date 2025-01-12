@@ -25,7 +25,7 @@ export default function MyNavBar() {
     <>
       <Navbar expand="lg" className="bg-body-tertiary" fixed="top" bg="dark" data-bs-theme="dark">
         <Container>
-          <Navbar.Brand style={{ fontWeight: 500, verticalAlign: "baseline", fontSize: 25 }}><AutoStoriesIcon style={{fontSize:35, margin: 10}} />Homework Help</Navbar.Brand>
+          <Navbar.Brand className="d-flex" style={{ fontWeight: 500, alignItems: "center", fontSize: 25 }}><AutoStoriesIcon style={{fontSize:35, margin: 10}} />Homework Help</Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="mx-3" variant="underline">
@@ -41,20 +41,6 @@ export default function MyNavBar() {
                   <NavLink className="myLink" to="/">Home</NavLink>
                 </Nav.Item>
               </>}
-              
-              {/* <Nav.Link href="#home"><Link to="/login">Login</Link></Nav.Link>
-              <Nav.Link href="#link"><Link to="/register">Registration</Link></Nav.Link> */}
-              {/* <NavDropdown title="Dropdown" id="basic-nav-dropdown">
-              <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.2">
-                Another action
-              </NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
-              <NavDropdown.Divider />
-              <NavDropdown.Item href="#action/3.4">
-                Separated link
-              </NavDropdown.Item>
-              </NavDropdown> */}
             </Nav>
             {user !== null && <Navbar.Collapse className="justify-content-end mt-3 mb-2">
               <Navbar.Text className="m-2">
@@ -67,19 +53,6 @@ export default function MyNavBar() {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      {/* <Nav variant="underline" defaultActiveKey="/home">
-        <Nav.Item>
-          <Nav.Link href="/home">Active</Nav.Link>
-        </Nav.Item>
-        <Nav.Item>
-          <Nav.Link eventKey="link-1">Option 2</Nav.Link>
-        </Nav.Item>
-        <Nav.Item>
-          <Nav.Link eventKey="disabled" disabled>
-            Disabled
-          </Nav.Link>
-        </Nav.Item>
-      </Nav> */}
     </>
   );
 }

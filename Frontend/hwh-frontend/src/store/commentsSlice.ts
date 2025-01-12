@@ -58,6 +58,12 @@ export const commentSlice = createSlice({
     selectComment: (state, action:PayloadAction<{ index: number; }>) => {
       state.comment = state.comments[action.payload.index];
     },
+    voteComment: (state, action:PayloadAction<{ index: number; amt: number; }>) => {
+      state.comments[action.payload.index].voteCount += action.payload.amt;
+    },
+    markAnswerComment: (state, action:PayloadAction<{ index: number; isAns: boolean; }>) => {
+      state.comments[action.payload.index].isAnswer = action.payload.isAns;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -80,6 +86,6 @@ export const commentSlice = createSlice({
   }
 });
 
-export const { selectComment } = commentSlice.actions;
+export const { selectComment, voteComment, markAnswerComment } = commentSlice.actions;
 
 export default commentSlice.reducer;
