@@ -39,3 +39,10 @@ func GetUserIDFromJWT(token *jwt.Token) (uuid.UUID, error) {
 	claims := token.Claims.(jwt.MapClaims)
 	return uuid.Parse(claims["userId"].(string))
 }
+
+func CheckJWTExpired(token *jwt.Token) bool {
+	logInfo("Running CheckJWTExpired")
+	claims := token.Claims.(jwt.MapClaims)
+	tokenExpiry := claims["expiresAt"].(float64)
+	return tokenExpiry < float64(time.Now().Unix())
+}

@@ -40,6 +40,12 @@ func (apiCfg *APIConfig) middlewareAuth(handler authenticatedHandler) http.Handl
 		}
 
 		//Check whether token has expired
+		// fmt.Printf("JWT EXPIRED? %v\n", CheckJWTExpired(token))
+		if CheckJWTExpired(token) {
+			logError("JWT IS EXPIRED", nil)
+			PermissionDeniedRes(w)
+			return
+		}
 
 		userId, err := GetUserIDFromJWT(token)
 		if err != nil {
