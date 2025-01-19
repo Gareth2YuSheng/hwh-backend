@@ -70,7 +70,7 @@ func (apiCfg *APIConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Generate JWT
-	token, err := CreateJWT(user, apiCfg.JwtSecret)
+	token, err := CreateJWT(user, apiCfg.JWTSecret)
 	if err != nil {
 		logError("Error Creating JWT", err)
 		respondERROR(w, http.StatusInternalServerError, "Login Failed")

@@ -8,7 +8,7 @@ import (
 )
 
 func (s *PGStore) CreateUser(user *User) error {
-	logInfo("Running CreateUser")
+	logInfo("Running: Database - CreateUser")
 	query := `INSERT INTO users 
 	(userID, username, password, role, createdAt) 
 	values ($1, $2, $3, $4, $5)`
@@ -25,7 +25,7 @@ func (s *PGStore) CreateUser(user *User) error {
 }
 
 func (s *PGStore) GetUserByUserID(userID uuid.UUID) (*User, error) {
-	logInfo("Running GetUserByUserID")
+	logInfo("Running: Database - GetUserByUserID")
 	query := `SELECT * FROM users WHERE userID = $1 LIMIT 1`
 	rows, err := s.DB.Query(query, userID)
 	if err != nil {
@@ -38,7 +38,7 @@ func (s *PGStore) GetUserByUserID(userID uuid.UUID) (*User, error) {
 }
 
 func (s *PGStore) GetUserByUsername(username string) (*User, error) {
-	logInfo("Running GetUserByUsername")
+	logInfo("Running: Database - GetUserByUsername")
 	query := `SELECT * FROM users WHERE username = $1 LIMIT 1`
 	rows, err := s.DB.Query(query, username)
 	if err != nil {

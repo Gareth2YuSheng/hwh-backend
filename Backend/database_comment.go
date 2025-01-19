@@ -8,7 +8,7 @@ import (
 )
 
 func (s *PGStore) CreateComment(comment *Comment) error {
-	logInfo("Running CreateComment")
+	logInfo("Running: Database - CreateComment")
 	query := `INSERT INTO comments 
 	(commentID, content, voteCount, authorID, threadID, createdAt, updatedAt, isAnswer) 
 	values ($1, $2, $3, $4, $5, $6, $7, $8)`
@@ -28,7 +28,7 @@ func (s *PGStore) CreateComment(comment *Comment) error {
 }
 
 func (s *PGStore) GetAllCommentsByThreadIDWithVotesByUserID(count, page int, threadId, userId uuid.UUID) ([]*CommentWithVoteCondensed, int, error) {
-	logInfo("Running GetAllCommentsByThreadID")
+	logInfo("Running: Database - GetAllCommentsByThreadIDWithVotesByUserID")
 	query := `SELECT c.commentID, c.content, c.voteCount, 
 	c.authorID, u.username, c.threadID, c.createdAt, c.updatedAt, 
 	c.isAnswer, v.voteID, v.voteValue, 
@@ -80,7 +80,7 @@ func (s *PGStore) GetAllCommentsByThreadIDWithVotesByUserID(count, page int, thr
 }
 
 func (s *PGStore) GetAllCommentsByThreadID(count, page int, threadId uuid.UUID) ([]*Comment, int, error) {
-	logInfo("Running GetAllCommentsByThreadID")
+	logInfo("Running: Database - GetAllCommentsByThreadID")
 	query := `SELECT *, count(*) OVER() AS totalCount FROM comments 
 	WHERE threadID = $1
 	ORDER BY createdAt DESC OFFSET $2 LIMIT $3;`
@@ -103,7 +103,7 @@ func (s *PGStore) GetAllCommentsByThreadID(count, page int, threadId uuid.UUID) 
 }
 
 func (s *PGStore) GetCommentByCommentID(commentId uuid.UUID) (*Comment, error) {
-	logInfo("Running GetCommentByCommentID")
+	logInfo("Running: Database - GetCommentByCommentID")
 	query := `SELECT * FROM comments WHERE commentID = $1;`
 
 	rows, err := s.DB.Query(query, commentId)
@@ -117,7 +117,7 @@ func (s *PGStore) GetCommentByCommentID(commentId uuid.UUID) (*Comment, error) {
 }
 
 func (s *PGStore) UpdateCommentContent(comment *Comment) error {
-	logInfo("Running UpdateCommentContent")
+	logInfo("Running: Database - UpdateCommentContent")
 	query := `UPDATE comments
 	SET content = $1, updatedAt = $2
 	WHERE commentID = $3`
@@ -132,7 +132,7 @@ func (s *PGStore) UpdateCommentContent(comment *Comment) error {
 }
 
 func (s *PGStore) UpdateCommentVoteCountByCommentID(commentId uuid.UUID, amt int) error {
-	logInfo("Running UpdateCommentVoteCountByCommentID")
+	logInfo("Running: Database - UpdateCommentVoteCountByCommentID")
 	query := `UPDATE comments
 	SET voteCount = voteCount + $1
 	WHERE commentID = $2`
@@ -156,7 +156,7 @@ func (s *PGStore) UpdateCommentVoteCountByCommentID(commentId uuid.UUID, amt int
 // }
 
 func (s *PGStore) UpdateCommentIsAnswer(comment *Comment) error {
-	logInfo("Running UpdateCommentIsAnswerByCommentID")
+	logInfo("Running: Database - UpdateCommentIsAnswer")
 	query := `UPDATE comments
 	SET isAnswer = $1
 	WHERE commentID = $2`
@@ -168,7 +168,7 @@ func (s *PGStore) UpdateCommentIsAnswer(comment *Comment) error {
 }
 
 func (s *PGStore) DeleteCommentByCommentID(commentId uuid.UUID) error {
-	logInfo("Running DeleteCommentByCommentID")
+	logInfo("Running: Database - DeleteCommentByCommentID")
 	query := `DELETE FROM comments
 	WHERE commentID = $1`
 	_, err := s.DB.Query(query, commentId)
@@ -215,7 +215,6 @@ func scanIntoGetCommentsWithVotes(rows *sql.Rows) (*GetCommentWithVoteSQL, error
 	vote := new(VoteSQL)
 	getComment.Comment = comment
 	getComment.Vote = vote
-	//Change this
 	err := rows.Scan(
 		&comment.CommentID,
 		&comment.Content,

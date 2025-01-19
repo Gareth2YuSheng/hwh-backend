@@ -8,7 +8,7 @@ import (
 )
 
 func (s *PGStore) CreateVote(vote *Vote) error {
-	logInfo("Running CreateVote")
+	logInfo("Running: Database - CreateVote")
 	query := `INSERT INTO votes 
 	(voteID, voteValue, authorID, commentID) 
 	values ($1, $2, $3, $4);`
@@ -24,7 +24,7 @@ func (s *PGStore) CreateVote(vote *Vote) error {
 }
 
 func (s *PGStore) GetVotesForCommentByUser(commentId, authorId uuid.UUID) (*Vote, error) {
-	logInfo("Running GetVotesForCommentByUser")
+	logInfo("Running: Database - GetVotesForCommentByUser")
 	query := `SELECT * FROM votes
 	WHERE commentID = $1 AND authorID = $2;`
 	// fmt.Println(commentId)
@@ -41,7 +41,7 @@ func (s *PGStore) GetVotesForCommentByUser(commentId, authorId uuid.UUID) (*Vote
 }
 
 func (s *PGStore) UpdateVoteVoteValue(vote *Vote) error {
-	logInfo("Running UpdateVoteVoteValue")
+	logInfo("Running: Database - UpdateVoteVoteValue")
 	query := `UPDATE votes 
 	SET voteValue = $1
 	WHERE voteID = $2;`
@@ -53,7 +53,7 @@ func (s *PGStore) UpdateVoteVoteValue(vote *Vote) error {
 }
 
 func (s *PGStore) DeleteVote(vote *Vote) error {
-	logInfo("Running DeleteVoteByVoteID")
+	logInfo("Running: Database - DeleteVoteByVoteID")
 	query := `DELETE FROM votes
 	WHERE voteID = $1;`
 	_, err := s.DB.Query(query, vote.VoteID)

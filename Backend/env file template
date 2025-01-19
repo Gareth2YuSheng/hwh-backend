@@ -1,3 +1,4 @@
 PORT=8080
 DB_URL=postgres://postgres:root@localhost:5432/hwhelp?sslmode=disable
 JWT_SECRET=DrLigma
+CLOUDINARY_URL=cloudinary://API_KEY:API_SECRET@CLOUD_NAME

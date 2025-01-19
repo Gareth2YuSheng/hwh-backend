@@ -8,7 +8,7 @@ import (
 )
 
 func (s *PGStore) CreateThread(thread *Thread) error {
-	logInfo("Running CreateThread")
+	logInfo("Running: Database - CreateThread")
 	query := `INSERT INTO threads 
 	(threadID, title, content, commentCount, authorID, tagID, createdAt, updatedAt) 
 	values ($1, $2, $3, $4, $5, $6, $7, $8)`
@@ -28,7 +28,7 @@ func (s *PGStore) CreateThread(thread *Thread) error {
 }
 
 func (s *PGStore) GetAllThreads(count, page int, search string, tagID uuid.UUID) ([]*ThreadCondensed, int, error) {
-	logInfo("Running GetAllThreads")
+	logInfo("Running: Database - GetAllThreads")
 	query := `SELECT threadID, title, commentCount, users.username, threads.tagID, tags.name, threads.createdAt, count(*) OVER() AS totalCount 
 	FROM threads, users, tags WHERE threads.authorId = users.userId AND tags.tagId = threads.tagId`
 	if search != "" {
@@ -58,7 +58,7 @@ func (s *PGStore) GetAllThreads(count, page int, search string, tagID uuid.UUID)
 }
 
 func (s *PGStore) GetThreadByThreadID(threadId uuid.UUID) (*Thread, error) {
-	logInfo("Running GetThreadByThreadID")
+	logInfo("Running: Database - GetThreadByThreadID")
 	query := `SELECT * FROM threads WHERE threadID = $1;`
 	rows, err := s.DB.Query(query, threadId)
 	if err != nil {
@@ -71,9 +71,11 @@ func (s *PGStore) GetThreadByThreadID(threadId uuid.UUID) (*Thread, error) {
 }
 
 func (s *PGStore) GetThreadDetailsByThreadID(threadId uuid.UUID) (*ThreadDetails, error) {
-	logInfo("Running GetThreadDetailsByThreadID")
-	query := `SELECT threadId, title, content, commentCount, authorId, username, threads.tagId, name, threads.createdAt, threads.updatedAt
-	 FROM threads, tags, users WHERE threads.authorId = users.userId AND tags.tagId = threads.tagId AND threadID = $1;`
+	logInfo("Running: Database - GetThreadDetailsByThreadID")
+	// query := `SELECT threadId, title, content, commentCount, authorId, username, threads.tagId, name, threads.createdAt, threads.updatedAt
+	//  FROM threads, tags, users WHERE threads.authorId = users.userId AND tags.tagId = threads.tagId AND threadID = $1;`
+	query := `SELECT threads.threadId, title, content, commentCount, authorId, username, threads.tagId, name, threads.createdAt, threads.updatedAt, images.cloudinaryURL
+	 FROM threads JOIN tags ON threads.tagId = tags.tagId JOIN users ON threads.authorId = users.userId LEFT JOIN images ON images.threadId = threads.threadId WHERE threads.threadID = $1;`
 	rows, err := s.DB.Query(query, threadId)
 	if err != nil {
 		return nil, err
@@ -85,7 +87,7 @@ func (s *PGStore) GetThreadDetailsByThreadID(threadId uuid.UUID) (*ThreadDetails
 }
 
 func (s *PGStore) UpdateThread(thread *Thread) error {
-	logInfo("Running UpdateThread")
+	logInfo("Running: Database - UpdateThread")
 	query := `UPDATE threads
 	SET title = $1, content = $2, updatedAt = $3
 	WHERE threadID = $4`
@@ -101,7 +103,7 @@ func (s *PGStore) UpdateThread(thread *Thread) error {
 }
 
 func (s *PGStore) UpdateThreadCommentCountByThreadID(threadId uuid.UUID, amt int) error {
-	logInfo("Running UpdateThreadCommentCountByThreadID")
+	logInfo("Running: Database - UpdateThreadCommentCountByThreadID")
 	query := `UPDATE threads
 	SET commentCount = commentCount + $1
 	WHERE threadID = $2;`
@@ -113,7 +115,7 @@ func (s *PGStore) UpdateThreadCommentCountByThreadID(threadId uuid.UUID, amt int
 }
 
 func (s *PGStore) DeleteThreadByThreadID(threadId uuid.UUID) error {
-	logInfo("Running DeleteThreadByThreadID")
+	logInfo("Running: Database - DeleteThreadByThreadID")
 	query := `DELETE FROM threads
 	WHERE threadID = $1;`
 	_, err := s.DB.Query(query, threadId)
@@ -149,7 +151,8 @@ func scanIntoThreadDetails(rows *sql.Rows) (*ThreadDetails, error) {
 		&thread.TagID,
 		&thread.TagName,
 		&thread.CreatedAt,
-		&thread.UpdatedAt)
+		&thread.UpdatedAt,
+		&thread.ImageURLNullable)
 	return thread, err
 }
 

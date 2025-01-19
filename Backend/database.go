@@ -53,7 +53,7 @@ func (s *PGStore) seedData() {
 }
 
 func (s *PGStore) seedUserTable() {
-	logInfo("Running seedUserTable")
+	logInfo("Running: Database INIT - seedUserTable")
 	admin, err := NewAdminUser("Robin Banks", "root")
 	if err != nil {
 		logError("Error Creating New Admin User Template", err)
@@ -74,7 +74,7 @@ func (s *PGStore) seedUserTable() {
 }
 
 func (s *PGStore) seedTagTable() {
-	logInfo("Running seedTagTable")
+	logInfo("Running: Database INIT - seedTagTable")
 	tagEng, err := NewTag("English")
 	if err != nil {
 		logError("Error Creating New Tag Template - English", err)
@@ -138,7 +138,7 @@ func (s *PGStore) dropAllTables() error {
 }
 
 func (s *PGStore) dropUserTable() error {
-	logInfo("Running dropUserTable")
+	logInfo("Running: Database INIT - dropUserTable")
 	query := `DROP TABLE IF EXISTS users;`
 
 	_, err := s.DB.Exec(query)
@@ -146,7 +146,7 @@ func (s *PGStore) dropUserTable() error {
 }
 
 func (s *PGStore) dropTagTable() error {
-	logInfo("Running dropUserTable")
+	logInfo("Running: Database INIT - dropUserTable")
 	query := `DROP TABLE IF EXISTS tags;`
 
 	_, err := s.DB.Exec(query)
@@ -154,7 +154,7 @@ func (s *PGStore) dropTagTable() error {
 }
 
 func (s *PGStore) dropThreadTable() error {
-	logInfo("Running dropThreadTable")
+	logInfo("Running: Database INIT - dropThreadTable")
 	query := `DROP TABLE IF EXISTS threads;`
 
 	_, err := s.DB.Exec(query)
@@ -170,7 +170,7 @@ func (s *PGStore) dropThreadTable() error {
 // }
 
 func (s *PGStore) dropCommentTable() error {
-	logInfo("Running dropCommentTable")
+	logInfo("Running: Database INIT - dropCommentTable")
 	query := `DROP TABLE IF EXISTS comments;`
 
 	_, err := s.DB.Exec(query)
@@ -178,7 +178,7 @@ func (s *PGStore) dropCommentTable() error {
 }
 
 func (s *PGStore) dropVoteTable() error {
-	logInfo("Running dropVoteTable")
+	logInfo("Running: Database INIT - dropVoteTable")
 	query := `DROP TABLE IF EXISTS votes;`
 
 	_, err := s.DB.Exec(query)
@@ -186,7 +186,7 @@ func (s *PGStore) dropVoteTable() error {
 }
 
 func (s *PGStore) dropImageTable() error {
-	logInfo("Running dropImageTable")
+	logInfo("Running: Database INIT - dropImageTable")
 	query := `DROP TABLE IF EXISTS images;`
 
 	_, err := s.DB.Exec(query)
@@ -221,7 +221,7 @@ func (s *PGStore) createAllTables() error {
 }
 
 func (s *PGStore) createUserTable() error {
-	logInfo("Running createUserTable")
+	logInfo("Running: Database INIT - createUserTable")
 	query := `CREATE TABLE IF NOT EXISTS users (
 		userID UUID PRIMARY KEY,
 		username VARCHAR(100) UNIQUE NOT NULL,
@@ -235,7 +235,7 @@ func (s *PGStore) createUserTable() error {
 }
 
 func (s *PGStore) createTagTable() error {
-	logInfo("Running createTagTable")
+	logInfo("Running: Database INIT - createTagTable")
 	query := `CREATE TABLE IF NOT EXISTS tags (
 		tagID UUID PRIMARY KEY,
 		name VARCHAR(100) UNIQUE NOT NULL
@@ -246,7 +246,7 @@ func (s *PGStore) createTagTable() error {
 }
 
 func (s *PGStore) createThreadTable() error {
-	logInfo("Running createThreadTable")
+	logInfo("Running: Database INIT - createThreadTable")
 	query := `CREATE TABLE IF NOT EXISTS threads (
 		threadID UUID PRIMARY KEY,
 		title VARCHAR(200) NOT NULL,
@@ -275,7 +275,7 @@ func (s *PGStore) createThreadTable() error {
 // }
 
 func (s *PGStore) createCommentTable() error {
-	logInfo("Running createCommentTable")
+	logInfo("Running: Database INIT - createCommentTable")
 	query := `CREATE TABLE IF NOT EXISTS comments (
 		commentID UUID PRIMARY KEY,
 		content TEXT NOT NULL,
@@ -292,7 +292,7 @@ func (s *PGStore) createCommentTable() error {
 }
 
 func (s *PGStore) createVoteTable() error {
-	logInfo("Running createVoteTable")
+	logInfo("Running: Database INIT - createVoteTable")
 	query := `CREATE TABLE IF NOT EXISTS votes (
 		voteID UUID PRIMARY KEY,
 		voteValue INTEGER NOT NULL,
@@ -305,10 +305,11 @@ func (s *PGStore) createVoteTable() error {
 }
 
 func (s *PGStore) createImageTable() error {
-	logInfo("Running createImageTable")
+	logInfo("Running: Database INIT - createImageTable")
 	query := `CREATE TABLE IF NOT EXISTS images (
 		imageID UUID PRIMARY KEY,
-		threadID UUID NOT NULL REFERENCES users(userID) ON DELETE CASCADE
+		threadID UUID NOT NULL REFERENCES threads(threadID) ON DELETE CASCADE,
+		cloudinaryURL TEXT NOT NULL
 	);`
 
 	_, err := s.DB.Exec(query)

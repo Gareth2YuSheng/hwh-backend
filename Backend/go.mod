@@ -13,4 +13,12 @@ require github.com/google/uuid v1.6.0
 
 require github.com/golang-jwt/jwt/v5 v5.2.1
 
-require golang.org/x/crypto v0.31.0
+require (
+	github.com/cloudinary/cloudinary-go/v2 v2.9.0
+	golang.org/x/crypto v0.31.0
+)
+
+require (
+	github.com/creasty/defaults v1.7.0 // indirect
+	github.com/gorilla/schema v1.4.1 // indirect
+)

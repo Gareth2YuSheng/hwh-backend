@@ -1,10 +1,13 @@
 package main
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
@@ -13,14 +16,36 @@ import (
 // CREATE NEW THREAD
 func (apiCfg *APIConfig) handlerCreateThread(w http.ResponseWriter, r *http.Request, user User) {
 	logInfo("Running handlerCreateThread")
-	req := CreateThreadRequest{}
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	//Parse JSON BODY
+	// req := CreateThreadRequest{}
+	// if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	// 	ErrorParsingJSON(err, w)
+	// 	return
+	// }
+	// defer r.Body.Close()
+	//Create Thread based on JSON BODY
+	// thread, err := NewThread(req.Title, req.Content, user.UserID, req.TagID)
+	// if err != nil {
+	// 	logError("Error Creating New Standard Thread Template", err)
+	// 	respondERROR(w, http.StatusBadRequest, "Failed to Create Thread, Invalid Thread Details")
+	// 	return
+	// }
+	// fmt.Printf("New Thread: %v\n", thread) //remove later
+
+	//Parse FormData
+	err := r.ParseMultipartForm(60000) //Limit for cloundinary is 60MB
+	if err != nil {
 		ErrorParsingJSON(err, w)
 		return
 	}
-	defer r.Body.Close()
-
-	thread, err := NewThread(req.Title, req.Content, user.UserID, req.TagID)
+	//Create Thread based on FormData
+	tagId, err := uuid.Parse(r.PostFormValue("tagId"))
+	if err != nil {
+		logError("Error Parsing Tag Id", err)
+		ErrorParsingJSON(err, w)
+		return
+	}
+	thread, err := NewThread(r.PostFormValue("title"), r.PostFormValue("content"), user.UserID, tagId)
 	if err != nil {
 		logError("Error Creating New Standard Thread Template", err)
 		respondERROR(w, http.StatusBadRequest, "Failed to Create Thread, Invalid Thread Details")
@@ -28,12 +53,59 @@ func (apiCfg *APIConfig) handlerCreateThread(w http.ResponseWriter, r *http.Requ
 	}
 	fmt.Printf("New Thread: %v\n", thread) //remove later
 
+	//Get Form Image - Image is Optional (Only accept 1 image for now)
+	file, header, err := r.FormFile("image") //FormFile returns the first instance of image in the formdata
+	imageURL := ""
+	imageID := uuid.Nil
+	if err != nil && !strings.Contains(err.Error(), "no such file") {
+		logError("Error Parsing Form Image", err)
+		respondERROR(w, http.StatusBadRequest, "Failed to Create Thread, Invalid Image data")
+		return
+	}
+	if file != nil {
+		// //Load image data into memory
+		defer file.Close()
+		imageID = uuid.New()
+		imageData, err := io.ReadAll(file)
+		if err != nil {
+			logError("Error Parsing Form Image Data into Memory", err)
+			respondERROR(w, http.StatusBadRequest, "Failed to Create Thread, Invalid Image data")
+			return
+		}
+		mimeType := header.Header.Get("Content-Type")
+		//Convert image data to base64 URI for cloundinary upload
+		base64ImageData := base64.StdEncoding.EncodeToString(imageData)
+		imageURI := fmt.Sprintf("data:%s;base64,%s", mimeType, base64ImageData)
+		imageURL, err = apiCfg.Cloudinary.UploadImage(imageID, imageURI)
+		if err != nil {
+			logError("Image Upload to Cloudinary Failed", err)
+			respondERROR(w, http.StatusBadRequest, "Failed to Create Thread, Invalid Image data")
+			return
+		}
+	}
+	fmt.Println(imageURL)                // remove later
+	fmt.Printf("ImageID: %v\n", imageID) //remove later
+
 	//Create Thread
 	err = apiCfg.DB.CreateThread(thread)
 	if err != nil {
 		logError("Unable to Create Thread", err)
 		respondERROR(w, http.StatusInternalServerError, "Failed to Create Thread")
 		return
+	}
+
+	//If Image was uploaded Create Record in DB
+	if imageURL != "" && imageID != uuid.Nil {
+		err = apiCfg.DB.CreateImage(&Image{
+			ImageID:       imageID,
+			ThreadID:      thread.ThreadID,
+			CloudinaryURL: imageURL,
+		})
+		if err != nil {
+			logError("Unable to Create Image Record", err)
+			respondERROR(w, http.StatusInternalServerError, "Thread Created Successfully, Image Failed to Upload")
+			return
+		}
 	}
 
 	//Update Total Thread Tally Count
@@ -236,6 +308,9 @@ func (apiCfg *APIConfig) handlerGetTheadDetails(w http.ResponseWriter, r *http.R
 		logError(fmt.Sprintf("Unable to Get Thread [%s]", threadID.String()), err)
 		respondERROR(w, http.StatusBadRequest, "Failed to Get Thread: Invalid ThreadId")
 		return
+	}
+	if thread.ImageURLNullable.Valid {
+		thread.ImageURL = thread.ImageURLNullable.String
 	}
 
 	respondOK(w, http.StatusOK, "", GetThreadDetailsResponse{

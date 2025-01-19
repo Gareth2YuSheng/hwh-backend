@@ -27,7 +27,7 @@ func (apiCfg *APIConfig) middlewareAuth(handler authenticatedHandler) http.Handl
 
 		tokenString := splitToken[1]
 		// fmt.Printf("Token String: %s\n", tokenString) //remove later
-		token, err := ValidateJWT(tokenString, apiCfg.JwtSecret)
+		token, err := ValidateJWT(tokenString, apiCfg.JWTSecret)
 		if err != nil {
 			logError("Error Validating JWT", err)
 			PermissionDeniedRes(w)

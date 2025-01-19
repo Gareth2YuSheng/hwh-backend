@@ -28,16 +28,18 @@ type Thread struct {
 }
 
 type ThreadDetails struct {
-	ThreadID     uuid.UUID `json:"threadId"`
-	Title        string    `json:"title"`
-	Content      string    `json:"content"`
-	CommentCount int       `json:"commentCount"`
-	AuthorID     uuid.UUID `json:"authorId"`
-	Author       string    `json:"author"`
-	TagID        uuid.UUID `json:"tagId"`
-	TagName      string    `json:"tagName"`
-	CreatedAt    time.Time `json:"createdAt"`
-	UpdatedAt    time.Time `json:"updatedAt"`
+	ThreadID         uuid.UUID      `json:"threadId"`
+	Title            string         `json:"title"`
+	Content          string         `json:"content"`
+	CommentCount     int            `json:"commentCount"`
+	AuthorID         uuid.UUID      `json:"authorId"`
+	Author           string         `json:"author"`
+	TagID            uuid.UUID      `json:"tagId"`
+	TagName          string         `json:"tagName"`
+	CreatedAt        time.Time      `json:"createdAt"`
+	UpdatedAt        time.Time      `json:"updatedAt"`
+	ImageURLNullable sql.NullString `json:"-"`
+	ImageURL         string         `json:"imageURL"`
 }
 
 type ThreadCondensed struct {
@@ -121,8 +123,9 @@ type Tag struct {
 }
 
 type Image struct {
-	ImageID  uuid.UUID `json:"imageId"`
-	ThreadID uuid.UUID `json:"threaId"`
+	ImageID       uuid.UUID `json:"imageId"`
+	ThreadID      uuid.UUID `json:"threaId"`
+	CloudinaryURL string    `json:"cloudinaryURL"`
 }
 
 func NewStandardUser(username, password string) (*User, error) {

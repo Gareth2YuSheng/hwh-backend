@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"os"
@@ -11,8 +12,9 @@ import (
 )
 
 type APIConfig struct {
-	DB        *PGStore
-	JwtSecret string
+	DB         *PGStore
+	JWTSecret  string
+	Cloudinary *CldnryStore
 }
 
 func main() {
@@ -31,6 +33,10 @@ func main() {
 	if jwtSecret == "" {
 		logFatal("JWT_SECRET NOT FOUND", nil)
 	}
+	cloudinaryURL := os.Getenv("CLOUDINARY_URL")
+	if cloudinaryURL == "" {
+		logFatal("CLOUDINARY_URL NOT FOUND", nil)
+	}
 
 	logInfo("Connecting to DB")
 	//Connect to DB
@@ -38,14 +44,32 @@ func main() {
 	if err != nil {
 		logFatal("UNABLE TO CONNECT TO DATABASE", err)
 	}
-	apiCfg := APIConfig{
-		DB:        store,
-		JwtSecret: jwtSecret,
-	}
 	//Init DB
 	if err := store.dbInit(); err != nil {
 		logFatal("UNABLE TO INITIALIZE DATABASE", err)
 	}
+	//Init Cloudinary
+	logInfo("Connecting to Cloudinary")
+	ctx := context.Background()
+	cld, err := NewCloudinaryStore(cloudinaryURL, ctx)
+	if err != nil {
+		logFatal("UNABLE TO INITIALIZE CLOUDINARY CLIENT", err)
+	}
+
+	apiCfg := APIConfig{
+		DB:         store,
+		JWTSecret:  jwtSecret,
+		Cloudinary: cld,
+	}
+
+	//DELETE LATER
+	// duck, err := apiCfg.Cloudinary.GetImageURLByPublicId("duck_mah2gg")
+	// if err != nil {
+	// 	fmt.Printf("Error getting duck: %v\n", err)
+	// } else {
+	// 	fmt.Printf("Duck at: %s\n", duck)
+	// }
+	// apiCfg.Cloudinary.UploadImageTest()
 
 	logInfo("Creating Routers")
 	//ROUTERS

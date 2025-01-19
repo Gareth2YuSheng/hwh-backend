@@ -5,7 +5,7 @@ import (
 )
 
 func (s *PGStore) CreateTag(tag *Tag) error {
-	logInfo("Running CreateTag")
+	logInfo("Running: Database - CreateTag")
 	//Create Tag
 	query := `INSERT INTO tags
 	(tagID, name)
@@ -26,7 +26,7 @@ func (s *PGStore) CreateTag(tag *Tag) error {
 }
 
 func (s *PGStore) GetAllTags() ([]*Tag, error) {
-	logInfo("Running GetAllTags")
+	logInfo("Running: Database - GetAllTags")
 	query := `SELECT * FROM tags ORDER BY name ASC;`
 	rows, err := s.DB.Query(query)
 	if err != nil {
