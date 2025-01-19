@@ -1,4 +1,4 @@
-module github.com/Gareth2YuSheng/Homework-Help
+module github.com/Gareth2YuSheng/hwh-backend
 
 go 1.23.4
 
