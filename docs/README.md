@@ -1,4 +1,4 @@
-# Homework-Help
+# Homework-Help Backend
 
 CVWO Assignment Project
 Server written in GOLANG, Database using POSTGRESQL, Media storying using CLOUDINARY
@@ -6,7 +6,16 @@ By Gareth Too Yu Sheng
 
 ## Setting Up the Project
 
-### 1. Database Setup
+### 1. Installing Go
+
+If you already have Golang installed on your machine, feel free to skip this step.
+To download Go, go to [the official Go website](https://go.dev/dl/) to download Go.
+Select the suitable one for your machine to download, after downloading the installer file, install it.
+In the installer, leave everything as the default and install.
+
+For a clearer installation and setup process, watch [this video](https://www.youtube.com/watch?v=DFiXJKIF2ss).
+
+### 2. Database Setup
 
 If you already have a PostgreSQL database instance setup, feel free to skip this section and use your own database url.
 
@@ -25,7 +34,7 @@ A template for the env file required for this project is provided at the bottom 
 
 For a clearer installation and setup process of pgAdmin, you can watch [this video](https://www.youtube.com/watch?v=4qH-7w5LZsA).
 
-### 2. Cloudinary Setup
+### 3. Cloudinary Setup
 
 A Cloudinary account will be required for media storage, not to worry as there is a free tier available.
 Sign up for a Cloudinary account [here](https://cloudinary.com/users/register_free).
@@ -48,7 +57,7 @@ If you are having trouble finding your `API Key`, `API Secret` and `Cloud Name`,
 
 Once done retrieving the `DB_URL` and `CLOUDINARY_URL` we can start setting up the backend server.
 
-### 3. Backend Server Setup
+### 4. Backend Server Setup
 
 Before we start up the server, make sure you have the .env file created and setup. A template can be found at the bottom of the document.
 The `PORT` can be set whatever port you want, just make sure to avoid ports that are already in use on your machine.

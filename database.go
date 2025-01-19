@@ -28,7 +28,7 @@ func NewPGStore(dbURL string) (*PGStore, error) {
 // INIT FUNCTIONS
 func (s *PGStore) dbInit() error {
 	logInfo("Running dbInit")
-	//DROP TABLES
+	//DROP TABLES - uncomment and restart server to reset db
 	// if err := s.dropAllTables(); err != nil {
 	// 	return err
 	// }
