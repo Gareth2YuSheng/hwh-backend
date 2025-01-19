@@ -73,6 +73,11 @@ func (apiCfg *APIConfig) handlerCreateThread(w http.ResponseWriter, r *http.Requ
 			return
 		}
 		mimeType := header.Header.Get("Content-Type")
+		if !strings.HasPrefix(mimeType, "image/") {
+			logError("File sent was not an Image", err)
+			respondERROR(w, http.StatusBadRequest, "Failed to Create Thread, Invalid Image data")
+			return
+		}
 		//Convert image data to base64 URI for cloundinary upload
 		base64ImageData := base64.StdEncoding.EncodeToString(imageData)
 		imageURI := fmt.Sprintf("data:%s;base64,%s", mimeType, base64ImageData)

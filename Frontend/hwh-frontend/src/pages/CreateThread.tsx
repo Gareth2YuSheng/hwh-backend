@@ -1,5 +1,5 @@
 import { useState, useEffect, SyntheticEvent } from "react";
-import { Form, FloatingLabel, Button, Alert, Modal, Badge } from "react-bootstrap";
+import { Form, FloatingLabel, Button, Alert, Modal, Badge, Image } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 //Redux
@@ -29,6 +29,7 @@ export default function CreateThread({ mode }: Props) {
   const [title, setTitle] = useState("");
   const [threadContent, setContent] = useState("");
   const [disableSubmitBtn, setDisableSubmitBtn] = useState(false);
+  const [image, setImage] = useState<File | null>(null);
   //For Tag Dropdown
   const [selectedTagId, setSelectedTagId] = useState("");
   const [showCreateTagModal, setShowCreateTagModal] = useState(false);
@@ -112,18 +113,20 @@ export default function CreateThread({ mode }: Props) {
         console.log("Error:", err);
       }
     } else if (mode === "CREATE") {
+      const formData = new FormData();
+      formData.append("title", title)
+      formData.append("content", threadContent)
+      formData.append("tagId", selectedTagId)
+      if (image) {
+        formData.append("image", image);
+      }      
       try {
         const response = await fetch(`http://localhost:8080/thread/create`, {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`
           },
-          body: JSON.stringify({
-            "title": title,
-            "content": threadContent,
-            "tagId": selectedTagId
-          })
+          body: formData
         });
         const content = await response.json();
         if (content.success) {
@@ -255,6 +258,17 @@ export default function CreateThread({ mode }: Props) {
             onChange={e => setContent(e.target.value)}
             />
         </FloatingLabel>
+        {mode === "CREATE" ? <Form.Control className="mb-3" type="file" placeholder="Image" accept="image/*"
+          onChange={e => {
+            if (e.target instanceof HTMLInputElement) {
+              if (e.target.files != null && e.target.files.length > 0) {
+                setImage(e.target.files[0]);
+              }              
+            }
+          }} /> : <div style={{justifyContent:"center", display:"flex"}}>
+            <Image style={{marginBottom:"20px", maxHeight:"400px", maxWidth:"100%"}} src={thread?.imageURL} />
+          </div>}
+
         <Button variant="warning" className="mb-2 w-100" type="submit" disabled={disableSubmitBtn}>{mode === "UPDATE" ? "Update Thread" : "Create Thread"}</Button>
       </Form>
     </>

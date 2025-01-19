@@ -15,7 +15,11 @@ function App() {
   const location = useLocation();
 
   useEffect(() => {
-    if (location.pathname === "/" || location.pathname.startsWith("/threadDetails")) {
+    if (location.pathname === "/" 
+      || location.pathname.startsWith("/threadDetails") 
+      || location.pathname.startsWith("/updateThread")
+      || location.pathname.startsWith("/createComment")
+      || location.pathname.startsWith("/updateComment")) {
       document.body.style.placeItems = "start";
       document.body.style.paddingTop = "100px";
     } else {

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 
-import { Card, Badge, Button } from "react-bootstrap";
+import { Card, Badge, Button, Image } from "react-bootstrap";
 import CommentIcon from '@mui/icons-material/Comment';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -35,6 +35,7 @@ export default function ThreadDetailsCard({
       } else {
         setTimestamp(formatDateFromUTC(thread.createdAt));
       } 
+      console.log(thread)
     }    
   }, [thread]);
 
@@ -57,6 +58,9 @@ export default function ThreadDetailsCard({
           <Card.Text className="mb-4">
             {thread.content}
           </Card.Text>
+          {thread.imageURL && <div style={{justifyContent:"center", display:"flex"}}>
+              <Image style={{marginBottom:"20px", maxWidth:"100%", maxHeight:"450px"}} src={thread.imageURL} />
+            </div>}
           {viewingDetails && <Card.Text>
             <CommentIcon style={{marginRight:"5px", marginTop:"-3px"}}/>{thread.commentCount}
             <Button variant="warning" className="mx-3" onClick={createCommentNavigation}>Add a Comment</Button>

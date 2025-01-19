@@ -53,7 +53,7 @@ func (s *CldnryStore) GetImageURLByPublicId(publicId string) (string, error) {
 
 func (s *CldnryStore) UploadImage(imageID uuid.UUID, stringbase64URI string) (string, error) {
 	logInfo("Running: Cloudinary - UploadImage")
-	res, err := s.Cloudinary.Upload.UnsignedUpload(s.Context, "test cloudinary images/hq720.jpg", "HomeworkHelp", uploader.UploadParams{
+	res, err := s.Cloudinary.Upload.UnsignedUpload(s.Context, stringbase64URI, "HomeworkHelp", uploader.UploadParams{
 		FilenameOverride: imageID.String(),
 		PublicID:         imageID.String(),
 	})

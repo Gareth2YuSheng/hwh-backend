@@ -11,6 +11,7 @@ export interface Thread {
   tagName: string;
   createdAt: string;
   updatedAt: string;
+  imageURL: string;
 }
 
 interface ThreadsState {
