@@ -30,7 +30,7 @@ Select the suitable one for your machine to download, after downloading the inst
 
 For windows I recommend using the .msi intaller. Inside the installer, leave everything as the default and install.
 
-For a clearer installation and setup process, watch [this video](https://www.youtube.com/watch?v=DFiXJKIF2ss).
+For a clearer installation and setup process, you can watch [this video](https://www.youtube.com/watch?v=DFiXJKIF2ss).
 
 ### 2. Database Setup
 
