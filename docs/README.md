@@ -1,7 +1,7 @@
 # Homework-Help Backend
 
 CVWO Assignment Project
-Server written in GOLANG, Database using POSTGRESQL, Media storying using CLOUDINARY
+Server written in GOLANG, Database using POSTGRESQL, Media storage using CLOUDINARY
 
 By Gareth Too Yu Sheng
 
