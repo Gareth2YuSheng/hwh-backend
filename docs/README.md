@@ -59,7 +59,7 @@ Under _Servers > PostgreSQL > Databases_, right click on _Databases_, click on _
 ![pgadmin setup2](https://github.com/Gareth2YuSheng/hwh-backend/blob/main/docs/readmeImages/pgadmin_setup_2.png)
 
 Name the database whatever you like, no SQL file is required as the server will handle all the table setup once connected to the database.
-Setting a password for the databse is optional.
+Setting a password for the database is optional.
 ![pgadmin setup3](https://github.com/Gareth2YuSheng/hwh-backend/blob/main/docs/readmeImages/pgadmin_setup_3.png)
 
 For a clearer installation and setup process of PostgreSQL and pgAdmin, you can watch [this video](https://www.youtube.com/watch?v=4qH-7w5LZsA).
