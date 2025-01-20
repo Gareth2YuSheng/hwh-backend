@@ -107,6 +107,7 @@ Once the _upload preset_ has been created successfully, update the `CLOUDINARY_U
 e.g. For mine it will be `CLOUDINARY_UPLOAD_PRESET=HomeworkHelp`
 
 Next we need the API keys, similarly under _Product environment settings_, navigate to _API Keys_.
+
 ![api keys](https://github.com/Gareth2YuSheng/hwh-backend/blob/main/docs/readmeImages/api_keys.png)
 
 Your _Cloudinary Url_ looks like `cloudinary://API_KEY:API_SECRET@CLOUD_NAME`. There will already be 1 API Key created for you by default, it is
