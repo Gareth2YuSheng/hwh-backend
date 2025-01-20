@@ -10,19 +10,21 @@ import (
 )
 
 type CldnryStore struct {
-	Cloudinary *cloudinary.Cloudinary
-	Context    context.Context
+	Cloudinary   *cloudinary.Cloudinary
+	Context      context.Context
+	UploadPreset string
 }
 
-func NewCloudinaryStore(cloudinaryURL string, ctx context.Context) (*CldnryStore, error) {
+func NewCloudinaryStore(cloudinaryURL string, ctx context.Context, uploadPreset string) (*CldnryStore, error) {
 	logInfo("Running NewCloudinaryStore")
 	cld, err := cloudinary.New()
 	if err != nil {
 		return nil, err
 	}
 	return &CldnryStore{
-		Cloudinary: cld,
-		Context:    ctx,
+		Cloudinary:   cld,
+		Context:      ctx,
+		UploadPreset: uploadPreset,
 	}, nil
 }
 
@@ -39,21 +41,9 @@ func (s *CldnryStore) GetImageURLByPublicId(publicId string) (string, error) {
 	return url, nil
 }
 
-// func (s *CldnryStore) UploadImageTest() {
-// 	logInfo("Running GetImageURLUploadImageTestByPublicId")
-// 	res, err := s.Cloudinary.Upload.UnsignedUpload(s.Context, "test cloudinary images/hq720.jpg", "HomeworkHelp", uploader.UploadParams{
-// 		PublicID: uuid.New().String(),
-// 	})
-// 	if err != nil {
-// 		logError("Image Upload Test Failed", err)
-// 		return
-// 	}
-// 	fmt.Printf("Cloundinary Image Test Response:\n%v\n", res.SecureURL)
-// }
-
 func (s *CldnryStore) UploadImage(imageID uuid.UUID, stringbase64URI string) (string, error) {
 	logInfo("Running: Cloudinary - UploadImage")
-	res, err := s.Cloudinary.Upload.UnsignedUpload(s.Context, stringbase64URI, "HomeworkHelp", uploader.UploadParams{
+	res, err := s.Cloudinary.Upload.UnsignedUpload(s.Context, stringbase64URI, s.UploadPreset, uploader.UploadParams{
 		FilenameOverride: imageID.String(),
 		PublicID:         imageID.String(),
 	})

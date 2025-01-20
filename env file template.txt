@@ -1,0 +1,5 @@
+PORT=
+DB_URL=postgres://[db user]:[db password (optional)]@[db link/endpoint]:[portname]/[db name]?sslmode=disable
+JWT_SECRET=
+CLOUDINARY_URL=cloudinary://API_KEY:API_SECRET@CLOUD_NAME
+CLOUDINARY_UPLOAD_PRESET=

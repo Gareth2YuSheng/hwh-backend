@@ -10,7 +10,7 @@ type authenticatedHandler func(http.ResponseWriter, *http.Request, User)
 
 func (apiCfg *APIConfig) middlewareAuth(handler authenticatedHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		logInfo("Running middlewareAuth")
+		logInfo("Running: Auth - middlewareAuth")
 		auth := r.Header.Get("Authorization")
 		if auth == "" {
 			logError("Missing Auth Header", nil)

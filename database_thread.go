@@ -35,7 +35,7 @@ func (s *PGStore) GetAllThreads(count, page int, search string, tagID uuid.UUID)
 		query += ` AND title ILIKE '%` + search + `%'`
 	}
 	if tagID != uuid.Nil {
-		query += fmt.Sprintf(` AND tagID = '%v'`, tagID)
+		query += fmt.Sprintf(` AND threads.tagID = '%v'`, tagID)
 	}
 	query += fmt.Sprintf(` ORDER BY createdAt DESC OFFSET %d LIMIT %d;`, (page-1)*count, count)
 

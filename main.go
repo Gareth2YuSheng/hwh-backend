@@ -37,6 +37,10 @@ func main() {
 	if cloudinaryURL == "" {
 		logFatal("CLOUDINARY_URL NOT FOUND", nil)
 	}
+	cloudinaryUploadPreset := os.Getenv("CLOUDINARY_UPLOAD_PRESET")
+	if cloudinaryUploadPreset == "" {
+		logFatal("CLOUDINARY_UPLOAD_PRESET NOT FOUND", nil)
+	}
 
 	logInfo("Connecting to DB")
 	//Connect to DB
@@ -51,7 +55,7 @@ func main() {
 	//Init Cloudinary
 	logInfo("Connecting to Cloudinary")
 	ctx := context.Background()
-	cld, err := NewCloudinaryStore(cloudinaryURL, ctx)
+	cld, err := NewCloudinaryStore(cloudinaryURL, ctx, cloudinaryUploadPreset)
 	if err != nil {
 		logFatal("UNABLE TO INITIALIZE CLOUDINARY CLIENT", err)
 	}
@@ -61,15 +65,6 @@ func main() {
 		JWTSecret:  jwtSecret,
 		Cloudinary: cld,
 	}
-
-	//DELETE LATER
-	// duck, err := apiCfg.Cloudinary.GetImageURLByPublicId("duck_mah2gg")
-	// if err != nil {
-	// 	fmt.Printf("Error getting duck: %v\n", err)
-	// } else {
-	// 	fmt.Printf("Duck at: %s\n", duck)
-	// }
-	// apiCfg.Cloudinary.UploadImageTest()
 
 	logInfo("Creating Routers")
 	//ROUTERS
