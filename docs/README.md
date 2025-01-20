@@ -11,10 +11,10 @@ By Gareth Too Yu Sheng
 If you have already downloaded and unzipped the Github Repo, please skip ahead to the next steps.
 
 To download the Github Repo, at the top of the page select _Code > Download ZIP_ to download the repo.
-![download repo](https://github.com/Gareth2YuSheng/hwh-backend/docs/readmeImages/download_repo.png)
+![download repo](https://github.com/Gareth2YuSheng/hwh-backend/blob/main/docs/readmeImages/download_repo.png)
 Save the zip somewhere on your local machine. After downloading, extract the project.
 After extracting the project, you should see a folder containing all the source code for the project.
-![download repo](https://github.com/Gareth2YuSheng/hwh-backend/docs/readmeImages/repo_unzipped.png)
+![download repo](https://github.com/Gareth2YuSheng/hwh-backend/blob/main/docs/readmeImages/repo_unzipped.png)
 Moving forward I will refer to this folder as the _main project directory_.
 
 ### 1. Installing Go
@@ -23,7 +23,7 @@ If you already have Golang installed on your machine, feel free to skip this ste
 
 To download Go, go to [the official Go website](https://go.dev/dl/) to download Go.
 Select the suitable one for your machine to download, after downloading the installer file, install it.
-![go download page](https://github.com/Gareth2YuSheng/hwh-backend/docs/readmeImages/go_download.png)
+![go download page](https://github.com/Gareth2YuSheng/hwh-backend/blob/main/docs/readmeImages/go_download.png)
 For windows I recommend using the .msi intaller. Inside the installer, leave everything as the default and install.
 
 For a clearer installation and setup process, watch [this video](https://www.youtube.com/watch?v=DFiXJKIF2ss).
@@ -33,33 +33,33 @@ For a clearer installation and setup process, watch [this video](https://www.you
 If you already have a PostgreSQL database instance setup, feel free to skip this section and use your own database url.
 
 To setup a Local Instance of PostgreSQL, download PostgreSQL and pgAdmin [here](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads).
-![pgsql download page](https://github.com/Gareth2YuSheng/hwh-backend/docs/readmeImages/pgsql_download.png)
+![pgsql download page](https://github.com/Gareth2YuSheng/hwh-backend/blob/main/docs/readmeImages/pgsql_download.png)
 Alternatively if you already have PostgreSQL installed but not pgAdmin, you can download pgAdmin [here](https://www.pgadmin.org/download/).
 Select the specific one for your machine and install, when running the PostgreSQL installer, make sure to leave these options checked to
 simultaneously install pgAdmin as well.
-![pgsql install](https://github.com/Gareth2YuSheng/hwh-backend/docs/readmeImages/pgsql_install.png)
+![pgsql install](https://github.com/Gareth2YuSheng/hwh-backend/blob/main/docs/readmeImages/pgsql_install.png)
 Make sure to set up a _root password_ when prompted and you can leave the _port number_ as the default.
-![pgsql install2](https://github.com/Gareth2YuSheng/hwh-backend/docs/readmeImages/pgsql_install_2.png)
-![pgsql install3](https://github.com/Gareth2YuSheng/hwh-backend/docs/readmeImages/pgsql_install_3.png)
+![pgsql install2](https://github.com/Gareth2YuSheng/hwh-backend/blob/main/docs/readmeImages/pgsql_install_2.png)
+![pgsql install3](https://github.com/Gareth2YuSheng/hwh-backend/blob/main/docs/readmeImages/pgsql_install_3.png)
 Go ahead and leave the rest of the options as default as well. If prompted, Stackbuilder is **NOT** required for this project, but you can install it if you'd like.
-![pgsql install3](https://github.com/Gareth2YuSheng/hwh-backend/docs/readmeImages/pgsql_install_4.png)
+![pgsql install3](https://github.com/Gareth2YuSheng/hwh-backend/blob/main/docs/readmeImages/pgsql_install_4.png)
 
 Once installed, start up pgAdmin. Click on _Servers_ on the left hand side menu, you will be prompted to enter the _root password_ that you created during the installation.
-![pgadmin setup](https://github.com/Gareth2YuSheng/hwh-backend/docs/readmeImages/pgadmin_setup.png)
+![pgadmin setup](https://github.com/Gareth2YuSheng/hwh-backend/blob/main/docs/readmeImages/pgadmin_setup.png)
 Under _Servers > PostgreSQL > Databases_, right click on _Databases_, click on _Create > Database..._ to create an new database.
-![pgadmin setup2](https://github.com/Gareth2YuSheng/hwh-backend/docs/readmeImages/pgadmin_setup_2.png)
+![pgadmin setup2](https://github.com/Gareth2YuSheng/hwh-backend/blob/main/docs/readmeImages/pgadmin_setup_2.png)
 Name the database whatever you like, no SQL file is required as the server will handle all the table setup once connected to the database.
 Setting a password for the databse is optional.
-![pgadmin setup3](https://github.com/Gareth2YuSheng/hwh-backend/docs/readmeImages/pgadmin_setup_3.png)
+![pgadmin setup3](https://github.com/Gareth2YuSheng/hwh-backend/blob/main/docs/readmeImages/pgadmin_setup_3.png)
 
 For a clearer installation and setup process of PostgreSQL and pgAdmin, you can watch [this video](https://www.youtube.com/watch?v=4qH-7w5LZsA).
 
 ### 3. Creating the .env file
 
 After setting up the database, create a .env file in the main project directory. It should look like this in the directory.
-![env file](https://github.com/Gareth2YuSheng/hwh-backend/docs/readmeImages/env_file.png)
+![env file](https://github.com/Gareth2YuSheng/hwh-backend/blob/main/docs/readmeImages/env_file.png)
 Next open the .env file in a text editor, and paste the following template into the file.
-![env file2](https://github.com/Gareth2YuSheng/hwh-backend/docs/readmeImages/env_file_template.png)
+![env file2](https://github.com/Gareth2YuSheng/hwh-backend/blob/main/docs/readmeImages/env_file_template.png)
 The .env file template can be found at the bottom of this document. Alternatively a template text file for the env file has been provided in the repo.
 
 Now that the local database instance has been created, we can update the `DB_URL` variable in the .env file.
@@ -80,23 +80,23 @@ Sign up for a Cloudinary account [here](https://cloudinary.com/users/register_fr
 After signing up for an account, we need to note down your Cloudinary Url for the .env file.
 First, login using your new account and go to the bottom left there will be a settings icon above your profile. Click on it to go to the settings page.
 At the top of the left side menu, you will see your `CLOUD_NAME`, under _Product environment settings_ navigate to _Upload Presets_.
-![upload preset](https://github.com/Gareth2YuSheng/hwh-backend/docs/readmeImages/upload_presets.png)
+![upload preset](https://github.com/Gareth2YuSheng/hwh-backend/blob/main/docs/readmeImages/upload_presets.png)
 There we will need to add a new _Upload Preset_, click on _Add Upload Preset_ on the top right and name it whatever you like, e.g. hw-help-preset,
 give a name for your _Asset Folder_ e.g. hw-help-images and make sure to change the _Signing mode_ to **Unsigned**.
 Change the _Generated public ID_ to "Use the filename of the uploaded file as the public ID" and leave the rest of the settings as the default.
-![new upload preset](https://github.com/Gareth2YuSheng/hwh-backend/docs/readmeImages/new_upload_preset.png)
+![new upload preset](https://github.com/Gareth2YuSheng/hwh-backend/blob/main/docs/readmeImages/new_upload_preset.png)
 Once done click Save on the top right. If succesful, you will see a new _upload preset_ added to the list of upload presets.
-![upload preset2](https://github.com/Gareth2YuSheng/hwh-backend/docs/readmeImages/upload_presets_2.png)
+![upload preset2](https://github.com/Gareth2YuSheng/hwh-backend/blob/main/docs/readmeImages/upload_presets_2.png)
 Once the _upload preset_ has been created successfully, update the `CLOUDINARY_UPLOAD_PRESET` in the .env file to whatever you named your _upload preset_.
 e.g. For mine it will be `CLOUDINARY_UPLOAD_PRESET=HomeworkHelp`
 
 Next we need the API keys, similarly under _Product environment settings_, navigate to _API Keys_.
-![api keys](https://github.com/Gareth2YuSheng/hwh-backend/docs/readmeImages/api_keys.png)
+![api keys](https://github.com/Gareth2YuSheng/hwh-backend/blob/main/docs/readmeImages/api_keys.png)
 Your _Cloudinary Url_ looks like `cloudinary://API_KEY:API_SECRET@CLOUD_NAME`. There will already be 1 API Key created for you by default, it is
 up to you whether you wish to use it or create a new one. Select an `API Key` of your choice and copy the `API Key` and `API Secret`
 into your _Cloudinary Url_ in the .env file. To copy the `API Secret` you need to click on the eye icon to view it first.
 On this page at the top also provides you with a sample Cloudinary Url with your `CLOUD_NAME`.
-![api keys2](https://github.com/Gareth2YuSheng/hwh-backend/docs/readmeImages/api_key_2.png)
+![api keys2](https://github.com/Gareth2YuSheng/hwh-backend/blob/main/docs/readmeImages/api_key_2.png)
 Alternatively you can also copy this into the .env file, but you are will required to copy the `API Key` and `API Secret` manually.
 If you are having trouble finding your `API Key`, `API Secret` and `Cloud Name`, you can watch [this video](https://www.youtube.com/watch?v=ok9mHOuvVSI).
 
