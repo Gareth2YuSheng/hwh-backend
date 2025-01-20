@@ -91,6 +91,7 @@ Sign up for a Cloudinary account [here](https://cloudinary.com/users/register_fr
 After signing up for an account, we need to note down your Cloudinary Url for the .env file.
 First, login using your new account and go to the bottom left there will be a settings icon above your profile. Click on it to go to the settings page.
 At the top of the left side menu, you will see your `CLOUD_NAME`, under _Product environment settings_ navigate to _Upload Presets_.
+
 ![upload preset](https://github.com/Gareth2YuSheng/hwh-backend/blob/main/docs/readmeImages/upload_presets.png)
 
 There we will need to add a new _Upload Preset_, click on _Add Upload Preset_ on the top right and name it whatever you like, e.g. hw-help-preset,
