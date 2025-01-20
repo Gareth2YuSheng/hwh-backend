@@ -54,6 +54,7 @@ Once installed, start up pgAdmin. Click on _Servers_ on the left hand side menu,
 ![pgadmin setup](https://github.com/Gareth2YuSheng/hwh-backend/blob/main/docs/readmeImages/pgadmin_setup.png)
 
 Under _Servers > PostgreSQL > Databases_, right click on _Databases_, click on _Create > Database..._ to create an new database.
+
 ![pgadmin setup2](https://github.com/Gareth2YuSheng/hwh-backend/blob/main/docs/readmeImages/pgadmin_setup_2.png)
 
 Name the database whatever you like, no SQL file is required as the server will handle all the table setup once connected to the database.
