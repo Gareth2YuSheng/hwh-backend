@@ -134,10 +134,18 @@ However, if you are still missing some modules, you can open up a terminal in th
 and run `go mod vendor` to install the required modules.
 
 Now that all the initial stuff is out of the way, we can finally run the project. Make sure that your .env file is in the main directory and not in
-a sub-directory. To build the project, run `go build`. After building, you should now see an .exe file has been generated in the main directory.
+a sub-directory. To build the project, open up a new terminal in the main project directory, run `go build`.
+After building, you should now see an .exe file has been generated in the main directory.
+
+![go build](https://github.com/Gareth2YuSheng/hwh-backend/blob/main/docs/readmeImages/go_build.png)
+
 To run the .exe file, you can run `./hwh-backend.exe` (or whatever the exe file is called) in the terminal. When running the .exe file for the first time,
 make sure to allow it access to the private network if not the server will not work.
-If everything was setup correctly, you should see > `INFO - Server starting on port: 8080` in the terminal. If something goes wrong, do double check that
+If everything was setup correctly, you should see > `INFO - Server starting on port: 8080` in the terminal.
+
+![go run](https://github.com/Gareth2YuSheng/hwh-backend/blob/main/docs/readmeImages/go_run.png)
+
+If something goes wrong, do double check that
 the .env file was setup correctly, alternatively you can check the terminal for any errors to try and troubleshoot what went wrong.
 
 ## .env File template
