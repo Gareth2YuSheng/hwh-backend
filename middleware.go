@@ -26,7 +26,6 @@ func (apiCfg *APIConfig) middlewareAuth(handler authenticatedHandler) http.Handl
 		}
 
 		tokenString := splitToken[1]
-		// fmt.Printf("Token String: %s\n", tokenString) //remove later
 		token, err := ValidateJWT(tokenString, apiCfg.JWTSecret)
 		if err != nil {
 			logError("Error Validating JWT", err)
@@ -40,7 +39,6 @@ func (apiCfg *APIConfig) middlewareAuth(handler authenticatedHandler) http.Handl
 		}
 
 		//Check whether token has expired
-		// fmt.Printf("JWT EXPIRED? %v\n", CheckJWTExpired(token))
 		if CheckJWTExpired(token) {
 			logError("JWT IS EXPIRED", nil)
 			PermissionDeniedRes(w)

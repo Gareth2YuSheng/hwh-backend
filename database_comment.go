@@ -143,18 +143,6 @@ func (s *PGStore) UpdateCommentVoteCountByCommentID(commentId uuid.UUID, amt int
 	return nil
 }
 
-// func (s *PGStore) UpdateCommentVoteCount(comment *Comment) error {
-// 	logInfo("Running UpdateCommentVoteCount")
-// 	query := `UPDATE comments
-// 	SET voteCount = voteCount + $1
-// 	WHERE commentID = $2`
-// 	_, err := s.DB.Query(query, amt, commentId)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return nil
-// }
-
 func (s *PGStore) UpdateCommentIsAnswer(comment *Comment) error {
 	logInfo("Running: Database - UpdateCommentIsAnswer")
 	query := `UPDATE comments

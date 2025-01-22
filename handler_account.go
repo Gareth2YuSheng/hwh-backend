@@ -9,7 +9,7 @@ import (
 
 // REGISTER NEW USER
 func (apiCfg *APIConfig) handlerCreateUser(w http.ResponseWriter, r *http.Request) {
-	logInfo("Running handlerCreateUser")
+	logInfo("Running: Handler - CreateUser")
 	req := CreateAccountRequest{}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		ErrorParsingJSON(err, w)
@@ -23,7 +23,6 @@ func (apiCfg *APIConfig) handlerCreateUser(w http.ResponseWriter, r *http.Reques
 		respondERROR(w, http.StatusBadRequest, "Failed to Register User, Invalid User Details")
 		return
 	}
-	fmt.Printf("New User: %v\n", user) //remove later
 
 	err = apiCfg.DB.CreateUser(user)
 	if err != nil {
@@ -42,7 +41,7 @@ func (apiCfg *APIConfig) handlerCreateUser(w http.ResponseWriter, r *http.Reques
 
 // LOGIN USER
 func (apiCfg *APIConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
-	logInfo("Running handlerLogin")
+	logInfo("Running: Handler - Login")
 	req := LoginRequest{}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		ErrorParsingJSON(err, w)
@@ -57,11 +56,9 @@ func (apiCfg *APIConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
 		respondERROR(w, http.StatusBadRequest, "Login Failed")
 		return
 	}
-	fmt.Printf("Found User: %v\n", user) //remove later
 
 	//Validate Password if user has password
 	if user.Password != "" {
-		fmt.Println("THERE IS A PASSWORD") //remove later
 		if !ComparePassword(user.Password, req.Password) {
 			logError(fmt.Sprintf("Incorrect Password for User [%s]", req.Username), nil)
 			respondERROR(w, http.StatusBadRequest, "Login Failed: Incorrect Username or Password")
@@ -76,7 +73,6 @@ func (apiCfg *APIConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
 		respondERROR(w, http.StatusInternalServerError, "Login Failed")
 		return
 	}
-	fmt.Println("JWT token ", token) //remove later
 
 	respondOK(w, http.StatusOK, "Login Successful", LoginResponse{
 		UserID:      user.UserID,
@@ -86,7 +82,7 @@ func (apiCfg *APIConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
 
 // GET USER DATA
 func (apiCfg *APIConfig) handlerGetUserData(w http.ResponseWriter, r *http.Request, user User) {
-	logInfo("Running handlerGetUserData")
+	logInfo("Running: Handler - GetUserData")
 
 	respondOK(w, http.StatusOK, "", GetUserDataResponse{
 		User: user,

@@ -15,22 +15,7 @@ import (
 
 // CREATE NEW THREAD
 func (apiCfg *APIConfig) handlerCreateThread(w http.ResponseWriter, r *http.Request, user User) {
-	logInfo("Running handlerCreateThread")
-	//Parse JSON BODY
-	// req := CreateThreadRequest{}
-	// if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-	// 	ErrorParsingJSON(err, w)
-	// 	return
-	// }
-	// defer r.Body.Close()
-	//Create Thread based on JSON BODY
-	// thread, err := NewThread(req.Title, req.Content, user.UserID, req.TagID)
-	// if err != nil {
-	// 	logError("Error Creating New Standard Thread Template", err)
-	// 	respondERROR(w, http.StatusBadRequest, "Failed to Create Thread, Invalid Thread Details")
-	// 	return
-	// }
-	// fmt.Printf("New Thread: %v\n", thread) //remove later
+	logInfo("Running: Handler - CreateThread")
 
 	//Parse FormData
 	err := r.ParseMultipartForm(60000) //Limit for cloundinary is 60MB
@@ -51,7 +36,6 @@ func (apiCfg *APIConfig) handlerCreateThread(w http.ResponseWriter, r *http.Requ
 		respondERROR(w, http.StatusBadRequest, "Failed to Create Thread, Invalid Thread Details")
 		return
 	}
-	fmt.Printf("New Thread: %v\n", thread) //remove later
 
 	//Get Form Image - Image is Optional (Only accept 1 image for now)
 	file, header, err := r.FormFile("image") //FormFile returns the first instance of image in the formdata
@@ -88,8 +72,6 @@ func (apiCfg *APIConfig) handlerCreateThread(w http.ResponseWriter, r *http.Requ
 			return
 		}
 	}
-	fmt.Println(imageURL)                // remove later
-	fmt.Printf("ImageID: %v\n", imageID) //remove later
 
 	//Create Thread
 	err = apiCfg.DB.CreateThread(thread)
@@ -113,28 +95,12 @@ func (apiCfg *APIConfig) handlerCreateThread(w http.ResponseWriter, r *http.Requ
 		}
 	}
 
-	//Update Total Thread Tally Count
-	// err = apiCfg.DB.UpdateTotalThreadTally(1)
-	// if err != nil {
-	// 	logError("Unable to Update Total Thead Tally", err)
-	// 	respondERROR(w, http.StatusInternalServerError, "Something Went Wrong")
-	// 	return
-	// }
-
-	// //Update Thread Tally Count for TagID
-	// err = apiCfg.DB.UpdateTagThreadTally(req.TagID, 1)
-	// if err != nil {
-	// 	logError(fmt.Sprintf("Unable to Update Thead Tally for Tag [%v]", req.TagID), err)
-	// 	respondERROR(w, http.StatusInternalServerError, "Something Went Wrong")
-	// 	return
-	// }
-
 	respondOK(w, http.StatusCreated, "Thread Created Successfully", nil)
 }
 
 // UPDATE THREAD
 func (apiCfg *APIConfig) handlerUpdateThread(w http.ResponseWriter, r *http.Request, user User) {
-	logInfo("Running handlerUpdateThread")
+	logInfo("Running: Handler - UpdateThread")
 	req := UpdateThreadRequest{}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		ErrorParsingJSON(err, w)
@@ -150,9 +116,6 @@ func (apiCfg *APIConfig) handlerUpdateThread(w http.ResponseWriter, r *http.Requ
 		respondERROR(w, http.StatusBadRequest, "Failed to Update Thread: Invalid ThreadId")
 		return
 	}
-
-	fmt.Printf("Thread: %v\n", threadId) //remove later
-	fmt.Printf("Body: %v\n", req)        //remove later
 
 	//Check Thread Exists First
 	thread, err := apiCfg.DB.GetThreadByThreadID(threadId)
@@ -189,7 +152,7 @@ func (apiCfg *APIConfig) handlerUpdateThread(w http.ResponseWriter, r *http.Requ
 
 // DELETE THREAD
 func (apiCfg *APIConfig) handlerDeleteThread(w http.ResponseWriter, r *http.Request, user User) {
-	logInfo("Running handlerDeleteThread")
+	logInfo("Running: Handler - DeleteThread")
 	threadIdStr := chi.URLParam(r, "threadID")
 	threadId, err := uuid.Parse(threadIdStr)
 	if err != nil {
@@ -197,8 +160,6 @@ func (apiCfg *APIConfig) handlerDeleteThread(w http.ResponseWriter, r *http.Requ
 		respondERROR(w, http.StatusBadRequest, "Failed to Delete Thread: Invalid ThreadId")
 		return
 	}
-
-	fmt.Printf("Thread: %v\n", threadId) //remove later
 
 	//Check Thread Exists First
 	thread, err := apiCfg.DB.GetThreadByThreadID(threadId)
@@ -227,9 +188,8 @@ func (apiCfg *APIConfig) handlerDeleteThread(w http.ResponseWriter, r *http.Requ
 
 // GET ALL THREADS
 func (apiCfg *APIConfig) handlerGetAllThreads(w http.ResponseWriter, r *http.Request, user User) {
-	logInfo("Running handlerGetAllThreads")
+	logInfo("Running: Handler - GetAllThreads")
 	//Get Compulsory URL Query Params
-	fmt.Printf("%v\n", r.URL.Query()) //remove later
 	count, err := strconv.Atoi(r.URL.Query().Get("count"))
 	if err != nil {
 		InvalidURLQuery("GetAllThreads: Unable to get Count from URL Query", err, w)
@@ -239,7 +199,6 @@ func (apiCfg *APIConfig) handlerGetAllThreads(w http.ResponseWriter, r *http.Req
 		InvalidURLQuery("GetAllThreads: Count cannot be 0", err, w)
 		return
 	}
-	fmt.Println("Count: ", count) //remove later
 	page, err := strconv.Atoi(r.URL.Query().Get("page"))
 	if err != nil {
 		InvalidURLQuery("GetAllThreads: Unable to get Page from URL Query", err, w)
@@ -249,14 +208,12 @@ func (apiCfg *APIConfig) handlerGetAllThreads(w http.ResponseWriter, r *http.Req
 		InvalidURLQuery("GetAllThreads: Page cannot be 0", err, w)
 		return
 	}
-	fmt.Println("Page: ", page) //remove later
 
 	//Check and Get Optional URL Query Params
 	search := ""
 	_, searchOk := r.URL.Query()["search"]
 	if searchOk {
 		search = r.URL.Query().Get("search")
-		fmt.Println("Search Title: ", search) //remove later
 	}
 	tagId := uuid.Nil
 	_, tagOK := r.URL.Query()["tagId"]
@@ -266,13 +223,6 @@ func (apiCfg *APIConfig) handlerGetAllThreads(w http.ResponseWriter, r *http.Req
 			InvalidURLQuery("GetAllThreads: Unable to get TagID from URL Query", err, w)
 			return
 		}
-		fmt.Println("Filter By TagID: ", tagId) //remove later
-	}
-	if search == "" {
-		fmt.Println("No Search Title: ", search) //remove later
-	}
-	if tagId == uuid.Nil {
-		fmt.Println("No Filter By TagID: ", tagId) //remove later
 	}
 
 	threads, threadCount, err := apiCfg.DB.GetAllThreads(count, page, search, tagId)
@@ -282,23 +232,15 @@ func (apiCfg *APIConfig) handlerGetAllThreads(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	// tally, err := apiCfg.DB.GetTotalThreadTally()
-	// if err != nil {
-	// 	logError("Unable to Get Total Thread Tally", err)
-	// 	respondERROR(w, http.StatusInternalServerError, "Failed to Get Threads")
-	// 	return
-	// }
-
 	respondOK(w, http.StatusOK, "", GetThreadsResponse{
 		ThreadCount: threadCount,
 		Threads:     threads,
 	})
-	// respondOK(w, http.StatusOK, "", struct{}{})
 }
 
 // GET DETAILS OF A SPECIFIC THREAD
 func (apiCfg *APIConfig) handlerGetTheadDetails(w http.ResponseWriter, r *http.Request, user User) {
-	logInfo("Running handlerGetTheadDetails")
+	logInfo("Running: Handler - GetTheadDetails")
 	//Get ThreadID from URL Params
 	threadIDStr := chi.URLParam(r, "threadID")
 	threadID, err := uuid.Parse(threadIDStr)

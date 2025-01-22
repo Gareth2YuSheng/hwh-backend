@@ -27,13 +27,10 @@ func (s *PGStore) GetVotesForCommentByUser(commentId, authorId uuid.UUID) (*Vote
 	logInfo("Running: Database - GetVotesForCommentByUser")
 	query := `SELECT * FROM votes
 	WHERE commentID = $1 AND authorID = $2;`
-	// fmt.Println(commentId)
-	// fmt.Println(authorId)
 	rows, err := s.DB.Query(query, commentId, authorId)
 	if err != nil {
 		return nil, err
 	}
-	// fmt.Println("Ligging")
 	for rows.Next() {
 		return scanIntoVote(rows)
 	}

@@ -12,6 +12,7 @@ type PGStore struct {
 }
 
 func NewPGStore(dbURL string) (*PGStore, error) {
+	logInfo("Running: Database INIT - NewPGStore")
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil {
 		return nil, err
@@ -27,7 +28,7 @@ func NewPGStore(dbURL string) (*PGStore, error) {
 
 // INIT FUNCTIONS
 func (s *PGStore) dbInit() error {
-	logInfo("Running dbInit")
+	logInfo("Running: Database INIT - dbInit")
 	//DROP TABLES - uncomment and restart server to reset db
 	// if err := s.dropAllTables(); err != nil {
 	// 	return err
@@ -48,7 +49,6 @@ func (s *PGStore) dbInit() error {
 
 func (s *PGStore) seedData() {
 	s.seedUserTable()
-	// s.seedThreadTallyTable()
 	s.seedTagTable()
 }
 
@@ -102,14 +102,6 @@ func (s *PGStore) seedTagTable() {
 	}
 }
 
-// func (s *PGStore) seedThreadTallyTable() {
-// 	logInfo("Running seedThreadTallyTable")
-// 	err := s.CreateTotalThreadTally()
-// 	if err != nil && !strings.Contains(err.Error(), "duplicate key") {
-// 		logError("unable to Create Total Thread Tally", err)
-// 	}
-// }
-
 //DROP TABLE FUNCTIONS
 
 func (s *PGStore) dropAllTables() error {
@@ -122,9 +114,6 @@ func (s *PGStore) dropAllTables() error {
 	if err := s.dropCommentTable(); err != nil {
 		return err
 	}
-	// if err := s.dropThreadTallyTable(); err != nil {
-	// 	return err
-	// }
 	if err := s.dropThreadTable(); err != nil {
 		return err
 	}
@@ -160,14 +149,6 @@ func (s *PGStore) dropThreadTable() error {
 	_, err := s.DB.Exec(query)
 	return err
 }
-
-// func (s *PGStore) dropThreadTallyTable() error {
-// 	logInfo("Running dropThreadTallyTable")
-// 	query := `DROP TABLE IF EXISTS threadtally;`
-
-// 	_, err := s.DB.Exec(query)
-// 	return err
-// }
 
 func (s *PGStore) dropCommentTable() error {
 	logInfo("Running: Database INIT - dropCommentTable")
@@ -261,18 +242,6 @@ func (s *PGStore) createThreadTable() error {
 	_, err := s.DB.Exec(query)
 	return err
 }
-
-// func (s *PGStore) createThreadTallyTable() error {
-// 	logInfo("Running createThreadTallyTable")
-// 	query := `CREATE TABLE IF NOT EXISTS threadtally (
-// 		tallyID SERIAL PRIMARY KEY,
-// 		tagID UUID NULL REFERENCES tags(tagID) ON DELETE RESTRICT,
-// 		count INTEGER NOT NULL
-// 	);`
-
-// 	_, err := s.DB.Exec(query)
-// 	return err
-// }
 
 func (s *PGStore) createCommentTable() error {
 	logInfo("Running: Database INIT - createCommentTable")

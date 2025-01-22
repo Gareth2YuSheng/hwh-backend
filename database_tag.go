@@ -16,12 +16,6 @@ func (s *PGStore) CreateTag(tag *Tag) error {
 	if err != nil {
 		return err
 	}
-	//Create ThreadTally for the Tag
-	// err = s.CreateThreadTally(&ThreadTally{TagID: tag.TagID, Count: 0})
-	// if err != nil {
-	// 	logError(fmt.Sprintf("Unable to Create ThreadTally for new Tag [%d]", tag.TagID), err)
-	// 	return err
-	// }
 	return nil
 }
 

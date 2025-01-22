@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
+	"strings"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -15,6 +17,11 @@ func logInfo(message string) {
 
 func logError(message string, err error) {
 	log.Printf("ERROR - %s: %v\n", message, err)
+	//If Error is that DB has too many clients, cut the server
+	if strings.Contains(err.Error(), "too many clients") || strings.Contains(err.Error(), "remaining connection slots are reserved") {
+		os.Exit(1)
+		//Combine with script on EC2 instance to restart the server on exit
+	}
 }
 
 func logFatal(message string, err error) {
@@ -25,10 +32,6 @@ func logFatal(message string, err error) {
 func PermissionDeniedRes(w http.ResponseWriter) {
 	respondERROR(w, http.StatusForbidden, "Permission Denied")
 }
-
-// func SomethingWentWrongRes(w http.ResponseWriter) {
-// 	respondERROR(w, http.StatusBadRequest, "Invalid Request Body")
-// }
 
 func ErrorParsingJSON(err error, w http.ResponseWriter) {
 	logError("Error parsing JSON", err)

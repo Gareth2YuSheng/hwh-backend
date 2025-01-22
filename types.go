@@ -61,7 +61,6 @@ type GetThreadsResponse struct {
 
 type GetThreadDetailsResponse struct {
 	Thread *ThreadDetails `json:"thread"`
-	// Commends []*Comment `json:"comments"`
 }
 
 type GetCommentsResponse struct {

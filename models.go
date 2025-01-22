@@ -52,16 +52,6 @@ type ThreadCondensed struct {
 	CreatedAt    time.Time `json:"createdAt"`
 }
 
-// type ThreadTally struct {
-// 	TallyID int       `json:"tallyId"`
-// 	TagID   uuid.UUID `json:"tagId"`
-// 	Count   int       `json:"count"`
-// }
-
-// type TotalThreadTally struct {
-// 	Count int `json:"count"`
-// }
-
 type Comment struct {
 	CommentID uuid.UUID `json:"commentId"`
 	Content   string    `json:"content"`
@@ -253,7 +243,6 @@ func NewComment(content string, threadID, authorId uuid.UUID) (*Comment, error) 
 func (c *Comment) UpdateCommentContent(content string) error {
 	logInfo("Running UpdateCommentContent")
 	if content == "" {
-		fmt.Println("Lig")
 		return fmt.Errorf("content cannot be empty")
 	}
 	c.Content = content
@@ -303,23 +292,3 @@ func (v *Vote) UpdateVoteValue(voteVal int) error {
 	v.VoteValue = voteVal
 	return nil
 }
-
-// func NewThreadTally(tagId uuid.UUID) (*ThreadTally, error) {
-// 	logInfo("Running NewThreadTally")
-// 	if tagId == uuid.Nil {
-// 		return nil, fmt.Errorf("tagID cannot be empty")
-// 	}
-// 	return &ThreadTally{
-// 		TagID: tagId,
-// 		Count: 0,
-// 	}, nil
-// }
-
-// func (tt *ThreadTally) UpdateThreadTally(amt int) error {
-// 	logInfo("Running UpdateThreadTally")
-// 	if amt == 0 {
-// 		return fmt.Errorf("amt cannot be 0")
-// 	}
-// 	tt.Count += amt
-// 	return nil
-// }

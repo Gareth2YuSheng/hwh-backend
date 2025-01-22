@@ -21,12 +21,10 @@ func respondJSON(w http.ResponseWriter, statusCode int, success bool, message st
 	if err != nil {
 		logError(fmt.Sprintf("Failed to marshal JSON response: %v", res), err)
 		w.WriteHeader(500)
-		//return fmt.Errorf("Failed to marshal JSON response: %v", res)
 		return
 	}
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
-	//return json.NewEncoder(w).Encode(data)
 	w.Write(res)
 }
 

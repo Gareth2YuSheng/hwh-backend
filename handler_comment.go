@@ -13,7 +13,7 @@ import (
 
 // UNVOTE COMMENT
 func (apiCfg *APIConfig) handlerUnVoteComment(w http.ResponseWriter, r *http.Request, user User) {
-	logInfo("Running handlerUnVoteComment")
+	logInfo("Running: Handler - UnVoteComment")
 	//Get CommentID from URL Params
 	commentIdStr := chi.URLParam(r, "commentID")
 	commentId, err := uuid.Parse(commentIdStr)
@@ -22,9 +22,6 @@ func (apiCfg *APIConfig) handlerUnVoteComment(w http.ResponseWriter, r *http.Req
 		respondERROR(w, http.StatusBadRequest, "Failed to Vote Comment: Invalid CommentId")
 		return
 	}
-
-	fmt.Printf("Comment: %v\n", commentId) //remove later
-	// fmt.Printf("Body: %v\n", req)          //remove later
 
 	//Check whether vote already exists
 	vote, err := apiCfg.DB.GetVotesForCommentByUser(commentId, user.UserID)
@@ -62,7 +59,7 @@ func (apiCfg *APIConfig) handlerUnVoteComment(w http.ResponseWriter, r *http.Req
 
 // VOTE COMMENT
 func (apiCfg *APIConfig) handlerVoteComment(w http.ResponseWriter, r *http.Request, user User) {
-	logInfo("Running handlerVoteComment")
+	logInfo("Running: Handler - VoteComment")
 	req := VoteCommentRequest{}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		ErrorParsingJSON(err, w)
@@ -78,9 +75,6 @@ func (apiCfg *APIConfig) handlerVoteComment(w http.ResponseWriter, r *http.Reque
 		respondERROR(w, http.StatusBadRequest, "Failed to Vote Comment: Invalid CommentId")
 		return
 	}
-
-	fmt.Printf("Comment: %v\n", commentId) //remove later
-	fmt.Printf("Body: %v\n", req)          //remove later
 
 	//Validation
 	if strings.ToLower(req.VoteType) != "up" && strings.ToLower(req.VoteType) != "down" {
@@ -106,8 +100,6 @@ func (apiCfg *APIConfig) handlerVoteComment(w http.ResponseWriter, r *http.Reque
 	} else if strings.ToLower(req.VoteType) == "down" {
 		voteVal = -1
 	}
-
-	fmt.Printf("Vote Value: %d\n", voteVal) //remove later
 
 	//If vote already exists and has the same vote value - do nothing
 	if vote != nil && vote.VoteValue == voteVal {
@@ -160,8 +152,6 @@ func (apiCfg *APIConfig) handlerVoteComment(w http.ResponseWriter, r *http.Reque
 		}
 	}
 
-	fmt.Printf("Vote Value Update by: %d\n", voteVal) //remove later
-
 	//Update Comment Vote Count for last 2 cases
 	err = apiCfg.DB.UpdateCommentVoteCountByCommentID(commentId, voteVal)
 	if err != nil {
@@ -175,7 +165,7 @@ func (apiCfg *APIConfig) handlerVoteComment(w http.ResponseWriter, r *http.Reque
 
 // CREATE COMMENT
 func (apiCfg *APIConfig) handlerCreateComment(w http.ResponseWriter, r *http.Request, user User) {
-	logInfo("Running handlerCreateComment")
+	logInfo("Running: Handler - CreateComment")
 	req := CreateCommentRequest{}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		ErrorParsingJSON(err, w)
@@ -206,7 +196,6 @@ func (apiCfg *APIConfig) handlerCreateComment(w http.ResponseWriter, r *http.Req
 		respondERROR(w, http.StatusBadRequest, "Failed to Create Comment, Invalid Comment Details")
 		return
 	}
-	fmt.Printf("New Comment: %v\n", comment) //remove later
 
 	//Create Comment
 	err = apiCfg.DB.CreateComment(comment)
@@ -229,9 +218,8 @@ func (apiCfg *APIConfig) handlerCreateComment(w http.ResponseWriter, r *http.Req
 
 // GET ALL COMMENTS FOR THREAD
 func (apiCfg *APIConfig) handlerGetAllComments(w http.ResponseWriter, r *http.Request, user User) {
-	logInfo("Running handlerGetAllComments")
+	logInfo("Running: Handler - GetAllComments")
 	//Get Compulsory URL Query Params
-	fmt.Printf("%v\n", r.URL.Query()) //remove later
 	count, err := strconv.Atoi(r.URL.Query().Get("count"))
 	if err != nil {
 		InvalidURLQuery("GetAllComments: Unable to get Count from URL Query", err, w)
@@ -241,7 +229,6 @@ func (apiCfg *APIConfig) handlerGetAllComments(w http.ResponseWriter, r *http.Re
 		InvalidURLQuery("GetAllComments: Count cannot be 0", err, w)
 		return
 	}
-	fmt.Println("Count: ", count) //remove later
 	page, err := strconv.Atoi(r.URL.Query().Get("page"))
 	if err != nil {
 		InvalidURLQuery("GetAllThreads: Unable to get Page from URL Query", err, w)
@@ -251,7 +238,6 @@ func (apiCfg *APIConfig) handlerGetAllComments(w http.ResponseWriter, r *http.Re
 		InvalidURLQuery("GetAllThreads: Page cannot be 0", err, w)
 		return
 	}
-	fmt.Println("Page: ", page) //remove later
 
 	//Get ThreadID from URL Params
 	threadIDStr := chi.URLParam(r, "threadID")
@@ -271,7 +257,6 @@ func (apiCfg *APIConfig) handlerGetAllComments(w http.ResponseWriter, r *http.Re
 	}
 
 	comments, commentCount, err := apiCfg.DB.GetAllCommentsByThreadIDWithVotesByUserID(count, page, threadID, user.UserID)
-	// comments, commentCount, err := apiCfg.DB.GetAllCommentsByThreadID(count, page, threadID)
 	if err != nil {
 		logError(fmt.Sprintf("Unable to Get Comments: Page[%d] Count[%d] ThreadID[%s]", page, count, threadID.String()), err)
 		respondERROR(w, http.StatusInternalServerError, "Failed to Get Comments")
@@ -302,9 +287,6 @@ func (apiCfg *APIConfig) handlerUpdateComment(w http.ResponseWriter, r *http.Req
 		respondERROR(w, http.StatusBadRequest, "Failed to Update Comment: Invalid CommentId")
 		return
 	}
-
-	fmt.Printf("Comment: %v\n", commentId) //remove later
-	fmt.Printf("Body: %v\n", req)          //remove later
 
 	//Check Comment Exists First
 	comment, err := apiCfg.DB.GetCommentByCommentID(commentId)
@@ -341,9 +323,8 @@ func (apiCfg *APIConfig) handlerUpdateComment(w http.ResponseWriter, r *http.Req
 
 // MARK COMMENT AS CORRECT
 func (apiCfg *APIConfig) handlerMarkCommentAsAnswer(w http.ResponseWriter, r *http.Request, user User) {
-	logInfo("Running handlerMarkCommentAsAnswer")
+	logInfo("Running: Handler - MarkCommentAsAnswer")
 	//User Req Query instead of Req Body as Boolean will always default to false if missing in body
-	fmt.Printf("%v\n", r.URL.Query()) //remove later
 	isAnswerStr := strings.ToLower(r.URL.Query().Get("isAnswer"))
 	//Validation
 	if isAnswerStr != "true" && isAnswerStr != "false" {
@@ -364,9 +345,6 @@ func (apiCfg *APIConfig) handlerMarkCommentAsAnswer(w http.ResponseWriter, r *ht
 		respondERROR(w, http.StatusBadRequest, "Failed to Mark Comment as Answer: Invalid CommentId")
 		return
 	}
-
-	fmt.Printf("Comment: %v\n", commentId) //remove later
-	// fmt.Printf("Body: %v\n", req)          //remove later
 
 	//Check Comment Exists First
 	comment, err := apiCfg.DB.GetCommentByCommentID(commentId)
@@ -417,7 +395,7 @@ func (apiCfg *APIConfig) handlerMarkCommentAsAnswer(w http.ResponseWriter, r *ht
 
 // DELETE COMMENT
 func (apiCfg *APIConfig) handlerDeleteComment(w http.ResponseWriter, r *http.Request, user User) {
-	logInfo("Running handlerDeleteComment")
+	logInfo("Running: Handler - DeleteComment")
 	commentIdStr := chi.URLParam(r, "commentID")
 	commentId, err := uuid.Parse(commentIdStr)
 	if err != nil {
@@ -425,8 +403,6 @@ func (apiCfg *APIConfig) handlerDeleteComment(w http.ResponseWriter, r *http.Req
 		respondERROR(w, http.StatusBadRequest, "Failed to Update Comment: Invalid CommentId")
 		return
 	}
-
-	fmt.Printf("Comment: %v\n", commentId) //remove later
 
 	//Check Comment Exists First
 	comment, err := apiCfg.DB.GetCommentByCommentID(commentId)

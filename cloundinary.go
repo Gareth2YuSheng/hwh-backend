@@ -16,7 +16,7 @@ type CldnryStore struct {
 }
 
 func NewCloudinaryStore(cloudinaryURL string, ctx context.Context, uploadPreset string) (*CldnryStore, error) {
-	logInfo("Running NewCloudinaryStore")
+	logInfo("Running: Cloudinary INIT - NewCloudinaryStore")
 	cld, err := cloudinary.New()
 	if err != nil {
 		return nil, err

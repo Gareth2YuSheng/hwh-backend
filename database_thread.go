@@ -39,7 +39,6 @@ func (s *PGStore) GetAllThreads(count, page int, search string, tagID uuid.UUID)
 	}
 	query += fmt.Sprintf(` ORDER BY createdAt DESC OFFSET %d LIMIT %d;`, (page-1)*count, count)
 
-	fmt.Println(query) //remove later
 	rows, err := s.DB.Query(query)
 	if err != nil {
 		return nil, 0, err
@@ -72,10 +71,13 @@ func (s *PGStore) GetThreadByThreadID(threadId uuid.UUID) (*Thread, error) {
 
 func (s *PGStore) GetThreadDetailsByThreadID(threadId uuid.UUID) (*ThreadDetails, error) {
 	logInfo("Running: Database - GetThreadDetailsByThreadID")
-	// query := `SELECT threadId, title, content, commentCount, authorId, username, threads.tagId, name, threads.createdAt, threads.updatedAt
-	//  FROM threads, tags, users WHERE threads.authorId = users.userId AND tags.tagId = threads.tagId AND threadID = $1;`
-	query := `SELECT threads.threadId, title, content, commentCount, authorId, username, threads.tagId, name, threads.createdAt, threads.updatedAt, images.cloudinaryURL
-	 FROM threads JOIN tags ON threads.tagId = tags.tagId JOIN users ON threads.authorId = users.userId LEFT JOIN images ON images.threadId = threads.threadId WHERE threads.threadID = $1;`
+	query := `SELECT threads.threadId, title, content, commentCount, authorId, username, threads.tagId, 
+	 name, threads.createdAt, threads.updatedAt, images.cloudinaryURL
+	 FROM threads 
+	 JOIN tags ON threads.tagId = tags.tagId 
+	 JOIN users ON threads.authorId = users.userId 
+	 LEFT JOIN images ON images.threadId = threads.threadId 
+	 WHERE threads.threadID = $1;`
 	rows, err := s.DB.Query(query, threadId)
 	if err != nil {
 		return nil, err

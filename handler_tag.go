@@ -2,14 +2,13 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 )
 
 // CREATE NEW TAG
 func (apiCfg *APIConfig) handlerCreateTag(w http.ResponseWriter, r *http.Request, user User) {
-	logInfo("Running handlerCreateTag")
+	logInfo("Running: Handler - CreateTag")
 	req := CreateTagRequest{}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		ErrorParsingJSON(err, w)
@@ -23,7 +22,6 @@ func (apiCfg *APIConfig) handlerCreateTag(w http.ResponseWriter, r *http.Request
 		respondERROR(w, http.StatusBadRequest, "Failed to Create Tag, Invalid Tag Details")
 		return
 	}
-	fmt.Printf("New Tag: %v\n", tag) //remove later
 
 	err = apiCfg.DB.CreateTag(tag)
 	if err != nil {
@@ -42,7 +40,7 @@ func (apiCfg *APIConfig) handlerCreateTag(w http.ResponseWriter, r *http.Request
 
 // GET ALL TAGS
 func (apiCfg *APIConfig) handlerGetAllTags(w http.ResponseWriter, r *http.Request, user User) {
-	logInfo("Running handlerGetAllTags")
+	logInfo("Running: Handler - GetAllTags")
 	tags, err := apiCfg.DB.GetAllTags()
 	if err != nil {
 		logError("Unable to Get Tags", err)
